@@ -8,7 +8,7 @@
 
 ![Flutter](https://img.shields.io/badge/Flutter-%2302569B.svg?style=for-the-badge&logo=Flutter&logoColor=white)
 ![Dart](https://img.shields.io/badge/dart-%230175C2.svg?style=for-the-badge&logo=dart&logoColor=white)
-![SQLite](https://img.shields.io/badge/sqlite-%2307405e.svg?style=for-the-badge&logo=sqlite&logoColor=white)
+![Hive](https://img.shields.io/badge/Hive-FF6F00?style=for-the-badge&logo=hive&logoColor=white)
 ![Android](https://img.shields.io/badge/Android-3DDC84?style=for-the-badge&logo=android&logoColor=white)
 ![iOS](https://img.shields.io/badge/iOS-000000?style=for-the-badge&logo=ios&logoColor=white)
 
@@ -61,7 +61,7 @@ This project is built using **Flutter** and follows a clean, maintainable archit
 - **Language**: Dart
 - **Framework**: Flutter
 - **State Management**: BLoC (Business Logic Component) & Cubit
-- **Database**: SQLite (via `sqflite`)
+- **Database**: Hive (NoSQL)
 - **Local Storage**: Shared Preferences
 - **Notifications**: Flutter Local Notifications
 - **PDF Generation**: `pdf` & `printing` packages
@@ -76,7 +76,7 @@ lib/
     theme/              # AppTheme definitions (Light/Dark)
     utils/              # Helpers for Dates, Images, and Parsing
  data/                   # Data layer
-    database/           # SQLite database helper and migrations
+    database/           # Hive database helper and adapters
     models/             # Data models (Product, Note, Category)
     repositories/       # Services for Auth, Backup, PDF, Notifications
  presentation/           # UI layer
