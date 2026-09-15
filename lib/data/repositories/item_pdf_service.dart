@@ -24,17 +24,19 @@ import '../models/item_with_details.dart';
 /// Photos are laid out in a 2-per-row grid, and any attached PDFs are
 /// rasterized page by page so the whole export is one self-contained PDF file.
 class ItemPdfService {
-  // Warm neumorphic palette mirrored from AppTheme (light mode).
+  // Brand palette — warm paper + sage-green accent (matches the app theme).
+  static const _ink = PdfColor.fromInt(0xFF4A453D);
+  static const _inkMid = PdfColor.fromInt(0xFF8C8776);
+  static const _inkFaint = PdfColor.fromInt(0xFFB3AC9C);
+  static const _subtle = PdfColor.fromInt(0xFFF2EEE6);
+  static const _border = PdfColor.fromInt(0xFFDED7CB);
   static const _accent = PdfColor.fromInt(0xFF7FA37A);
   static const _accentDeep = PdfColor.fromInt(0xFF3D5A3A);
-  static const _surface = PdfColor.fromInt(0xFFEDE7DE);
-  static const _textPrimary = PdfColor.fromInt(0xFF4A453D);
-  static const _textSecondary = PdfColor.fromInt(0xFF8C8776);
-  static const _outline = PdfColor.fromInt(0xFFB3AB9B);
-  static const _outlineVariant = PdfColor.fromInt(0xFFC4BCAD);
-  static const _dateAccent = PdfColor.fromInt(0xFF6E94A6);
-  static const _passwordAccent = PdfColor.fromInt(0xFFC98A3D);
-  static const _passwordRowTint = PdfColor.fromInt(0xFFF6EBD9);
+  static const _accentBg = PdfColor.fromInt(0xFFE9F2E8);
+  static const _tagBg = PdfColor.fromInt(0xFFF4F0E9);
+  static const _tagBorder = PdfColor.fromInt(0xFFD6CFC2);
+  static const _passwordAccent = PdfColor.fromInt(0xFFD99A44);
+  static const _passwordBg = PdfColor.fromInt(0xFFFBF1E2);
   static const _maskedPassword = '******** (protected)';
 
   /// Photos rendered per page (2 columns x 3 rows).
@@ -146,9 +148,10 @@ class ItemPdfService {
       pw.Text(
         details.item.title,
         style: pw.TextStyle(
-          fontSize: 26,
-          color: _accentDeep,
+          fontSize: 24,
+          color: _ink,
           fontWeight: pw.FontWeight.bold,
+          letterSpacing: -0.5,
         ),
       ),
       if (details.categoryName != null)
@@ -157,45 +160,45 @@ class ItemPdfService {
           child: pw.Text(
             details.categoryName!,
             style: pw.TextStyle(
-              fontSize: 13,
+              fontSize: 11,
               color: _accent,
               fontWeight: pw.FontWeight.bold,
             ),
           ),
         ),
       if (details.item.tags.isNotEmpty) ...[
-        pw.SizedBox(height: 10),
+        pw.SizedBox(height: 12),
         _tagWrap(details.item.tags),
       ],
-      pw.SizedBox(height: 22),
-      _sectionHeading('Item Details'),
-      pw.SizedBox(height: 10),
+      pw.SizedBox(height: 28),
+      _sectionHeading('Details'),
+      pw.SizedBox(height: 12),
       _buildFieldTable(details.fields, passwordValues),
       if (details.item.notes != null && details.item.notes!.isNotEmpty) ...[
-        pw.SizedBox(height: 22),
+        pw.SizedBox(height: 28),
         _sectionHeading('Notes'),
         pw.SizedBox(height: 10),
         pw.Container(
           width: double.infinity,
-          padding: pw.EdgeInsets.all(14),
+          padding: pw.EdgeInsets.all(16),
           decoration: pw.BoxDecoration(
-            color: _surface,
-            borderRadius: pw.BorderRadius.circular(10),
+            color: _subtle,
+            borderRadius: pw.BorderRadius.circular(8),
           ),
           child: pw.Text(
             details.item.notes!,
             style: pw.TextStyle(
-              color: _textPrimary,
-              fontSize: 11,
+              color: _inkMid,
+              fontSize: 10,
               lineSpacing: 4,
             ),
           ),
         ),
       ],
-      pw.SizedBox(height: 22),
+      pw.SizedBox(height: 28),
       pw.Text(
         'Created ${_formatDate(details.item.createdAt)}'
-        ' - Updated ${_formatDate(details.item.updatedAt)}',
+        '  ·  Updated ${_formatDate(details.item.updatedAt)}',
         style: _captionStyle,
       ),
     ];
@@ -204,19 +207,22 @@ class ItemPdfService {
   pw.Widget _tagWrap(List<String> tags) {
     return pw.Wrap(
       spacing: 6,
-      runSpacing: 4,
+      runSpacing: 6,
       children: tags
           .map(
             (tag) => pw.Container(
-              padding: pw.EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              padding: pw.EdgeInsets.symmetric(horizontal: 10, vertical: 5),
               decoration: pw.BoxDecoration(
-                color: _surface,
-                border: pw.Border.all(color: _outline, width: 0.6),
-                borderRadius: pw.BorderRadius.circular(6),
+                color: _tagBg,
+                border: pw.Border.all(color: _tagBorder, width: 0.5),
+                borderRadius: pw.BorderRadius.circular(20),
               ),
               child: pw.Text(
                 tag,
-                style: pw.TextStyle(fontSize: 9, color: _textSecondary),
+                style: pw.TextStyle(
+                  fontSize: 8.5,
+                  color: _inkMid,
+                ),
               ),
             ),
           )
@@ -225,10 +231,9 @@ class ItemPdfService {
   }
 
   /// Builds the 3-column [Type | Field | Value] details table. Every field is
-  /// included (text, date AND password rows) with color-coded type badges and
-  /// an amber tint on password rows for quick visual differentiation. Password
-  /// values are shown decrypted when supplied in [passwordValues], otherwise
-  /// masked — rows are never dropped.
+  /// included (text, date AND password rows) with a tinted type badge and a
+  /// pale highlight on password rows. Password values are shown decrypted when
+  /// supplied in [passwordValues], otherwise masked — rows are never dropped.
   pw.Widget _buildFieldTable(
     List<ItemField> fields,
     Map<int, String>? passwordValues,
@@ -238,19 +243,18 @@ class ItemPdfService {
 
     return pw.Table(
       border: pw.TableBorder(
-        top: pw.BorderSide(color: _outline, width: 0.6),
-        bottom: pw.BorderSide(color: _outline, width: 0.6),
-        verticalInside: pw.BorderSide(color: _outline, width: 0.6),
-        horizontalInside: pw.BorderSide(color: _outlineVariant, width: 0.4),
+        horizontalInside: pw.BorderSide(color: _border, width: 0.5),
+        bottom: pw.BorderSide(color: _border, width: 0.8),
       ),
       columnWidths: {
-        0: pw.FlexColumnWidth(0.7),
-        1: pw.FlexColumnWidth(1.3),
-        2: pw.FlexColumnWidth(2.4),
+        0: pw.FlexColumnWidth(0.8),
+        1: pw.FlexColumnWidth(1.35),
+        2: pw.FlexColumnWidth(2.5),
       },
       children: [
         pw.TableRow(
-          decoration: pw.BoxDecoration(color: _accent),
+          decoration: pw.BoxDecoration(color: _subtle),
+          verticalAlignment: pw.TableCellVerticalAlignment.middle,
           children: [
             _tableHeaderCell('TYPE'),
             _tableHeaderCell('FIELD'),
@@ -260,7 +264,7 @@ class ItemPdfService {
         for (final row in rows)
           pw.TableRow(
             decoration: row.isPassword
-                ? pw.BoxDecoration(color: _passwordRowTint)
+                ? pw.BoxDecoration(color: _passwordBg)
                 : null,
             verticalAlignment: pw.TableCellVerticalAlignment.middle,
             children: [
@@ -275,13 +279,14 @@ class ItemPdfService {
 
   static pw.Widget _tableHeaderCell(String text) {
     return pw.Padding(
-      padding: pw.EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      padding: pw.EdgeInsets.symmetric(horizontal: 12, vertical: 9),
       child: pw.Text(
         text,
         style: pw.TextStyle(
-          color: PdfColors.white,
-          fontSize: 10,
+          color: _ink,
+          fontSize: 9,
           fontWeight: pw.FontWeight.bold,
+          letterSpacing: 0.8,
         ),
       ),
     );
@@ -289,14 +294,14 @@ class ItemPdfService {
 
   static pw.Widget _typeBadge(PdfFieldRow row) {
     final (bg, fg) = switch (row.type) {
-      FieldType.text => (_outline, PdfColors.white),
-      FieldType.date => (_dateAccent, PdfColors.white),
-      FieldType.password => (_passwordAccent, PdfColors.white),
+      FieldType.text => (_tagBg, _inkMid),
+      FieldType.date => (_accentBg, _accentDeep),
+      FieldType.password => (_passwordBg, _passwordAccent),
     };
     return pw.Padding(
-      padding: pw.EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      padding: pw.EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       child: pw.Container(
-        padding: pw.EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+        padding: pw.EdgeInsets.symmetric(horizontal: 7, vertical: 2),
         decoration: pw.BoxDecoration(
           color: bg,
           borderRadius: pw.BorderRadius.circular(4),
@@ -305,8 +310,9 @@ class ItemPdfService {
           row.typeLabel,
           style: pw.TextStyle(
             color: fg,
-            fontSize: 7.5,
+            fontSize: 7,
             fontWeight: pw.FontWeight.bold,
+            letterSpacing: 0.3,
           ),
         ),
       ),
@@ -315,15 +321,12 @@ class ItemPdfService {
 
   static pw.Widget _fieldLabelCell(PdfFieldRow row) {
     return pw.Padding(
-      padding: pw.EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      padding: pw.EdgeInsets.symmetric(horizontal: 12, vertical: 9),
       child: pw.Text(
         row.fieldLabel,
         style: pw.TextStyle(
-          color: _textPrimary,
-          fontSize: 10,
-          fontWeight: row.isPassword
-              ? pw.FontWeight.bold
-              : pw.FontWeight.normal,
+          color: _ink,
+          fontSize: 9.5,
         ),
       ),
     );
@@ -331,18 +334,18 @@ class ItemPdfService {
 
   static pw.Widget _valueCell(PdfFieldRow row) {
     return pw.Padding(
-      padding: pw.EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      padding: pw.EdgeInsets.symmetric(horizontal: 12, vertical: 9),
       child: pw.Text(
         row.value,
         style: row.valueHidden
             ? pw.TextStyle(
-                color: _textSecondary,
-                fontSize: 10,
+                color: _inkFaint,
+                fontSize: 9.5,
                 fontStyle: pw.FontStyle.italic,
               )
             : pw.TextStyle(
-                color: row.isPassword ? _accentDeep : _textPrimary,
-                fontSize: 10,
+                color: row.isPassword ? _passwordAccent : _inkMid,
+                fontSize: 9.5,
                 fontWeight: row.isPassword
                     ? pw.FontWeight.bold
                     : pw.FontWeight.normal,
@@ -401,13 +404,13 @@ class ItemPdfService {
       final right = i + 1 < photos.length ? photos[i + 1] : null;
       rows.add(
         pw.Padding(
-          padding: pw.EdgeInsets.only(bottom: 16),
+          padding: pw.EdgeInsets.only(bottom: 18),
           child: pw.Row(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
               pw.Expanded(child: _photoCell(left, total)),
               if (right != null) ...[
-                pw.SizedBox(width: 12),
+                pw.SizedBox(width: 14),
                 pw.Expanded(child: _photoCell(right, total)),
               ],
             ],
@@ -430,8 +433,8 @@ class ItemPdfService {
           width: double.infinity,
           height: _photoRowHeight,
           child: pw.ClipRRect(
-            horizontalRadius: 12,
-            verticalRadius: 12,
+            horizontalRadius: 8,
+            verticalRadius: 8,
             child: pw.Image(pw.MemoryImage(photo.bytes), fit: pw.BoxFit.cover),
           ),
         ),
@@ -446,7 +449,7 @@ class ItemPdfService {
       _sectionHeading('Attached Document'),
       pw.SizedBox(height: 4),
       pw.Text(document.fileName, style: _captionStyle),
-      pw.SizedBox(height: 12),
+      pw.SizedBox(height: 14),
       for (var i = 0; i < document.pages.length; i++) ...[
         pw.Text(
           'Page ${i + 1} of ${document.pages.length}',
@@ -464,85 +467,90 @@ class ItemPdfService {
   }
 
   pw.Widget _sectionHeading(String text) {
-    return pw.Container(
-      padding: pw.EdgeInsets.only(bottom: 6),
-      decoration: pw.BoxDecoration(
-        border: pw.Border(
-          bottom: pw.BorderSide(color: _accent, width: 1.2),
+    return pw.Column(
+      crossAxisAlignment: pw.CrossAxisAlignment.start,
+      mainAxisSize: pw.MainAxisSize.min,
+      children: [
+        pw.Text(
+          text.toUpperCase(),
+          style: pw.TextStyle(
+            fontSize: 10,
+            color: _ink,
+            fontWeight: pw.FontWeight.bold,
+            letterSpacing: 1.2,
+          ),
         ),
-      ),
-      child: pw.Text(
-        text.toUpperCase(),
-        style: pw.TextStyle(
-          fontSize: 12,
-          color: _accentDeep,
-          fontWeight: pw.FontWeight.bold,
-        ),
-      ),
+        pw.SizedBox(height: 5),
+        pw.Container(height: 1, color: _ink),
+      ],
     );
   }
 
   pw.Widget _buildHeader(pw.Context context, String pageTitle) {
     final logo = _logo;
-    return pw.Container(
-      color: _accent,
-      padding: pw.EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      margin: pw.EdgeInsets.only(bottom: 20),
-      child: pw.Row(
-        mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: pw.CrossAxisAlignment.center,
-        children: [
-          pw.Row(
-            mainAxisSize: pw.MainAxisSize.min,
-            children: [
-              if (logo != null) ...[
-                pw.SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: pw.Image(logo, fit: pw.BoxFit.contain),
+    return pw.Column(
+      mainAxisSize: pw.MainAxisSize.min,
+      children: [
+        pw.Container(height: 3, color: _accent),
+        pw.SizedBox(height: 10),
+        pw.Row(
+          mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: pw.CrossAxisAlignment.center,
+          children: [
+            pw.Row(
+              mainAxisSize: pw.MainAxisSize.min,
+              children: [
+                if (logo != null) ...[
+                  pw.SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: pw.Image(logo, fit: pw.BoxFit.contain),
+                  ),
+                  pw.SizedBox(width: 8),
+                ],
+                pw.Text(
+                  AppConstants.appName,
+                  style: pw.TextStyle(
+                    color: _ink,
+                    fontWeight: pw.FontWeight.bold,
+                    fontSize: 12,
+                  ),
                 ),
-                pw.SizedBox(width: 8),
               ],
-              pw.Text(
-                AppConstants.appName,
-                style: pw.TextStyle(
-                  color: PdfColors.white,
-                  fontWeight: pw.FontWeight.bold,
-                  fontSize: 15,
-                ),
-              ),
-            ],
-          ),
-          pw.Flexible(
-            child: pw.Text(
-              pageTitle,
-              textAlign: pw.TextAlign.right,
-              style: pw.TextStyle(color: PdfColors.white, fontSize: 9),
             ),
-          ),
-        ],
-      ),
+            pw.Flexible(
+              child: pw.Text(
+                pageTitle,
+                textAlign: pw.TextAlign.right,
+                style: pw.TextStyle(
+                  color: _inkFaint,
+                  fontSize: 9,
+                ),
+                maxLines: 1,
+                overflow: pw.TextOverflow.visible,
+              ),
+            ),
+          ],
+        ),
+        pw.SizedBox(height: 10),
+        pw.Container(height: 0.5, color: _border),
+      ],
     );
   }
 
   pw.Widget _buildFooter(pw.Context context) {
     return pw.Container(
       padding: pw.EdgeInsets.only(top: 8),
-      decoration: pw.BoxDecoration(
-        border: pw.Border(
-          top: pw.BorderSide(color: _outlineVariant, width: 0.6),
-        ),
-      ),
       child: pw.Row(
         mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
         children: [
           pw.Text(
             'Exported from ${AppConstants.appName}'
-            ' - ${_formatDate(DateTime.now())}',
+            ' · ${_formatDate(DateTime.now())}',
             style: _captionStyle,
           ),
           pw.Text(
-            'Page ${context.pageNumber} of ${context.pagesCount}',
+            '${context.pageNumber} / ${context.pagesCount}',
             style: _captionStyle,
           ),
         ],
@@ -551,8 +559,8 @@ class ItemPdfService {
   }
 
   static const _captionStyle = pw.TextStyle(
-    fontSize: 8.5,
-    color: _textSecondary,
+    fontSize: 8,
+    color: _inkFaint,
   );
 
   // ---------------------------------------------------------------------------
@@ -622,7 +630,7 @@ class ItemPdfService {
   static Future<pw.MemoryImage?> _loadLogo() async {
     if (_cachedLogo != null) return _cachedLogo!;
     try {
-      final data = await rootBundle.load('assets/light_logo.png');
+      final data = await rootBundle.load('assets/logo.png');
       final bytes = data.buffer.asUint8List();
       const pngMagic = [0x89, 0x50, 0x4E, 0x47];
       final isPng = bytes.length >= 8 &&
