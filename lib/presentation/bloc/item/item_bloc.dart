@@ -186,7 +186,11 @@ class ItemBloc extends Bloc<ItemEvent, ItemState> {
     Emitter<ItemState> emit,
   ) async {
     try {
-      emit(ItemLoading());
+      // Skip the loading state when we already have cached data so refreshing
+      // through a filter (e.g. navigating back from details) stays flicker-free.
+      if (_cachedItems == null) {
+        emit(ItemLoading());
+      }
       if (event.categoryId == null) {
         final (items, stats) = await _loadAll();
         emit(ItemsLoaded(items, stats));

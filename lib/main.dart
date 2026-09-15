@@ -9,6 +9,7 @@ import 'data/database/database_helper.dart';
 import 'data/repositories/item_repository.dart';
 import 'data/repositories/image_storage_service.dart';
 import 'data/repositories/notification_service.dart';
+import 'data/repositories/item_pdf_service.dart';
 import 'data/repositories/backup_service.dart';
 import 'presentation/bloc/item/item_bloc.dart';
 import 'presentation/bloc/notification/notification_bloc.dart';
@@ -55,6 +56,7 @@ class KiptApp extends StatelessWidget {
         RepositoryProvider.value(value: imageStorageService),
         RepositoryProvider.value(value: notificationService),
         RepositoryProvider.value(value: backupService),
+        RepositoryProvider.value(value: ItemPdfService()),
       ],
       child: MultiBlocProvider(
         providers: [

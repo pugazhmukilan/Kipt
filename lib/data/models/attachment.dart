@@ -7,6 +7,7 @@ class Attachment extends Equatable {
   final bool isPhoto;
   final String mimetype;
   final DateTime addedAt;
+  final double? aspectRatio;
 
   const Attachment({
     this.id,
@@ -15,6 +16,7 @@ class Attachment extends Equatable {
     required this.isPhoto,
     required this.mimetype,
     required this.addedAt,
+    this.aspectRatio,
   });
 
   Map<String, dynamic> toMap() {
@@ -25,6 +27,7 @@ class Attachment extends Equatable {
       'is_photo': isPhoto ? 1 : 0,
       'mimetype': mimetype,
       'added_at': addedAt.toIso8601String(),
+      'aspect_ratio': aspectRatio,
     };
   }
 
@@ -36,6 +39,7 @@ class Attachment extends Equatable {
       isPhoto: (map['is_photo'] as int? ?? 1) == 1,
       mimetype: map['mimetype'] as String? ?? 'image/jpeg',
       addedAt: _parseDateTime(map['added_at']),
+      aspectRatio: (map['aspect_ratio'] as num?)?.toDouble(),
     );
   }
 
@@ -55,6 +59,7 @@ class Attachment extends Equatable {
     bool? isPhoto,
     String? mimetype,
     DateTime? addedAt,
+    double? aspectRatio,
   }) {
     return Attachment(
       id: id ?? this.id,
@@ -63,6 +68,7 @@ class Attachment extends Equatable {
       isPhoto: isPhoto ?? this.isPhoto,
       mimetype: mimetype ?? this.mimetype,
       addedAt: addedAt ?? this.addedAt,
+      aspectRatio: aspectRatio ?? this.aspectRatio,
     );
   }
 
@@ -71,5 +77,13 @@ class Attachment extends Equatable {
       Attachment.fromMap(json);
 
   @override
-  List<Object?> get props => [id, itemId, path, isPhoto, mimetype, addedAt];
+  List<Object?> get props => [
+    id,
+    itemId,
+    path,
+    isPhoto,
+    mimetype,
+    addedAt,
+    aspectRatio,
+  ];
 }

@@ -53,6 +53,8 @@ dependencies:
   
   # Secure Storage (PASSWORD field encryption — Android Keystore / iOS Secure Enclave)
   flutter_secure_storage: ^10.3.1
+  camera: ^0.12.0+2
+  image: ^4.3.0
 
 dev_dependencies:
   flutter_test:

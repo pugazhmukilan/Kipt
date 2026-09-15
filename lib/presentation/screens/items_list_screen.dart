@@ -34,10 +34,17 @@ class _ItemsListScreenState extends State<ItemsListScreen> {
   List<Category> _categories = [];
   int? _activeCategoryId;
 
+  // Local mirror of the last real list data. Rendered for ANY bloc state that
+  // isn't the loaded list (including ItemDetailsLoaded, ItemOperationSuccess,
+  // ItemLoading) so the home screen is never replaced by a spinner after an
+  // edit/save or when a detail screen is stacked on top.
+  List<ItemWithDetails>? _cachedItems;
+  DashboardStats? _cachedStats;
+  bool _hasLoaded = false;
+
   @override
   void initState() {
     super.initState();
-    context.read<ItemBloc>().add(const LoadItems());
     _loadCategories();
   }
 
@@ -50,26 +57,19 @@ class _ItemsListScreenState extends State<ItemsListScreen> {
     context.read<ItemBloc>().add(const LoadItems());
   }
 
-  /// Re-requests the full item list whenever the shared bloc is in a state
-  /// that does not represent the loaded list (ItemInitial, a transient
-  /// ItemOperationSuccess, etc.). Without this, those states would make the
-  /// list render blank or wrongly show "Nothing here yet".
-  ///
-  /// ItemDetailsLoaded is deliberately NOT re-dispatched here: when a detail
-  /// screen is pushed on top of this list, it is the detail screen's job to
-  /// drive that state. Dispatching LoadItems would ping-pong with the detail
-  /// screen's own re-request and loop forever.
+  /// Requests the full list once (cold start only). Never re-dispatches once
+  /// the list has been loaded, and never dispatches while a child route (such
+  /// as the detail screen) is on top — otherwise the list would fight the
+  /// detail screen's owns reloads and loop forever.
   void _ensureItemsLoaded(ItemState state) {
     if (state is ItemLoading) return;
-    if (state is ItemsLoaded ||
-        state is ItemsFiltered ||
-        state is ItemSearchResults ||
-        state is ItemError ||
-        state is ItemDetailsLoaded) {
-      return;
-    }
+    if (state is ItemError) return;
+    if (_hasLoaded || _cachedItems != null) return;
+    if (!(ModalRoute.of(context)?.isCurrent ?? true)) return;
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) context.read<ItemBloc>().add(const LoadItems());
+      if (!mounted) return;
+      if (!(ModalRoute.of(context)?.isCurrent ?? true)) return;
+      context.read<ItemBloc>().add(const LoadItems());
     });
   }
 
@@ -92,33 +92,36 @@ class _ItemsListScreenState extends State<ItemsListScreen> {
           }
         },
         builder: (context, state) {
-          List<ItemWithDetails> items = [];
-          DashboardStats stats = const DashboardStats();
-          bool hasListData = false;
-
+          // Mirror any data-carrying state into the local cache so rendering
+          // below never depends on the exact state type arriving.
           if (state is ItemsLoaded) {
-            items = state.items;
-            stats = state.stats;
-            hasListData = true;
+            _cachedItems = state.items;
+            _cachedStats = state.stats;
           } else if (state is ItemsFiltered) {
-            items = state.items;
-            stats = state.stats;
-            hasListData = true;
+            _cachedItems = state.items;
+            _cachedStats = state.stats;
           } else if (state is ItemSearchResults) {
-            items = state.results;
-            hasListData = true;
+            _cachedItems = state.results;
+          } else if (state is ItemDetailsLoaded) {
+            if (state.allItems != null) _cachedItems = state.allItems;
+            if (state.stats != null) _cachedStats = state.stats;
           }
 
+          final items = _cachedItems ?? const <ItemWithDetails>[];
+          final stats = _cachedStats ?? const DashboardStats();
+          final hasData = _cachedItems != null;
+          if (hasData) _hasLoaded = true;
+
           Widget content;
-          if (state is ItemLoading) {
+          if (state is ItemLoading && !hasData) {
             content = const SliverFillRemaining(
               child: Center(child: CircularProgressIndicator()),
             );
-          } else if (state is ItemError) {
+          } else if (state is ItemError && !hasData) {
             content = SliverFillRemaining(
               child: _ErrorState(message: state.message, onRetry: _reload),
             );
-          } else if (hasListData && items.isNotEmpty) {
+          } else if (hasData && items.isNotEmpty) {
             content = SliverPadding(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 100),
               sliver: SliverList(
@@ -131,11 +134,11 @@ class _ItemsListScreenState extends State<ItemsListScreen> {
                 ),
               ),
             );
-          } else if (hasListData) {
+          } else if (hasData) {
             content = SliverFillRemaining(child: _EmptyState());
           } else {
-            // ItemInitial, ItemOperationSuccess, stale ItemDetailsLoaded, etc.
-            // Never show a blank/misleading empty state — re-fetch instead.
+            // Cold start (ItemInitial) — request the list and show a spinner.
+            // Never shows a blank/empty state on the very first frame.
             _ensureItemsLoaded(state);
             content = const SliverFillRemaining(
               child: Center(child: CircularProgressIndicator()),
@@ -221,24 +224,44 @@ class _ItemsListScreenState extends State<ItemsListScreen> {
     context.read<ItemBloc>().add(FilterItemsByCategory(catId));
   }
 
+  /// Re-fetches the list after returning from a child screen. The home screen
+  /// is NOT rebuilt while an opaque route (Add/Edit/Detail/Search/Settings) is
+  /// on top, so it never saw the bloc states those screens produced — it must
+  /// explicitly reload once visible again. LoadItems skips the loading state
+  /// when a cache already exists, so this refresh is flicker-free.
+  void _refreshAfterReturn() {
+    if (!mounted) return;
+    if (_activeCategoryId != null) {
+      context.read<ItemBloc>().add(FilterItemsByCategory(_activeCategoryId));
+    } else {
+      context.read<ItemBloc>().add(const LoadItems());
+    }
+  }
+
   void _openDetail(ItemWithDetails item) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => ItemDetailScreen(itemId: item.item.id!),
-      ),
-    );
+    Navigator.of(context)
+        .push(
+          MaterialPageRoute(
+            builder: (_) => ItemDetailScreen(itemId: item.item.id!),
+          ),
+        )
+        .then((_) => _refreshAfterReturn());
   }
 
   void _openAddItem() {
     Navigator.of(
       context,
-    ).push(MaterialPageRoute(builder: (_) => const AddItemScreen()));
+    ).push(MaterialPageRoute(builder: (_) => const AddItemScreen())).then(
+      (_) => _refreshAfterReturn(),
+    );
   }
 
   void _openSearch() {
     Navigator.of(
       context,
-    ).push(MaterialPageRoute(builder: (_) => const SearchScreen()));
+    ).push(MaterialPageRoute(builder: (_) => const SearchScreen())).then(
+      (_) => _refreshAfterReturn(),
+    );
   }
 
   void _openSettings() {
@@ -249,6 +272,7 @@ class _ItemsListScreenState extends State<ItemsListScreen> {
       if (!mounted) return;
       widget.onSettingsNavigationEnd?.call();
       _loadCategories();
+      _refreshAfterReturn();
     });
   }
 }

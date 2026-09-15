@@ -70,12 +70,13 @@ class DatabaseHelper {
 
     await db.execute('''
       CREATE TABLE ${AppConstants.tableAttachments} (
-        id        INTEGER PRIMARY KEY AUTOINCREMENT,
-        item_id   INTEGER NOT NULL,
-        path      TEXT    NOT NULL,
-        is_photo  INTEGER DEFAULT 1,
-        mimetype  TEXT    NOT NULL,
-        added_at  TEXT    NOT NULL,
+        id           INTEGER PRIMARY KEY AUTOINCREMENT,
+        item_id      INTEGER NOT NULL,
+        path         TEXT    NOT NULL,
+        is_photo     INTEGER DEFAULT 1,
+        mimetype     TEXT    NOT NULL,
+        added_at     TEXT    NOT NULL,
+        aspect_ratio REAL,
         FOREIGN KEY (item_id) REFERENCES ${AppConstants.tableItems} (id) ON DELETE CASCADE
       )
     ''');
@@ -113,6 +114,7 @@ class DatabaseHelper {
   // ---------------------------------------------------------------------------
   // Migration — versions < 7 are incompatible; drop and recreate.
   // v7 → v8 adds the optional login_title column for login groups.
+  // v8 → v9 adds the optional aspect_ratio column for photo attachments.
   // ---------------------------------------------------------------------------
 
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
@@ -121,7 +123,9 @@ class DatabaseHelper {
       await db.execute('DROP TABLE IF EXISTS ocr_texts');
       await db.execute('DROP TABLE IF EXISTS ${AppConstants.tableNotesLegacy}');
       await db.execute('DROP TABLE IF EXISTS attachments');
-      await db.execute('DROP TABLE IF EXISTS ${AppConstants.tableProductsLegacy}');
+      await db.execute(
+        'DROP TABLE IF EXISTS ${AppConstants.tableProductsLegacy}',
+      );
       await db.execute('DROP TABLE IF EXISTS ${AppConstants.tableCategories}');
       await db.execute('DROP TABLE IF EXISTS ${AppConstants.tableItemFields}');
       await db.execute('DROP TABLE IF EXISTS ${AppConstants.tableItems}');
@@ -132,6 +136,12 @@ class DatabaseHelper {
       await db.execute(
         'ALTER TABLE ${AppConstants.tableItemFields} '
         "ADD COLUMN login_title TEXT",
+      );
+    }
+    if (oldVersion < 9) {
+      await db.execute(
+        'ALTER TABLE ${AppConstants.tableAttachments} '
+        'ADD COLUMN aspect_ratio REAL',
       );
     }
   }
@@ -199,17 +209,23 @@ class DatabaseHelper {
     final q = '%${query.toLowerCase()}%';
 
     // Items matching title or tags
-    final byTitle = await db.rawQuery('''
+    final byTitle = await db.rawQuery(
+      '''
       SELECT DISTINCT id FROM ${AppConstants.tableItems}
       WHERE LOWER(title) LIKE ? OR LOWER(tags) LIKE ?
-    ''', [q, q]);
+    ''',
+      [q, q],
+    );
 
     // Items with a matching non-PASSWORD field
-    final byField = await db.rawQuery('''
+    final byField = await db.rawQuery(
+      '''
       SELECT DISTINCT item_id as id FROM ${AppConstants.tableItemFields}
       WHERE field_type != 'PASSWORD'
         AND (LOWER(label) LIKE ? OR LOWER(value) LIKE ?)
-    ''', [q, q]);
+    ''',
+      [q, q],
+    );
 
     final ids = <int>{};
     for (final row in byTitle) {
@@ -341,7 +357,8 @@ class DatabaseHelper {
   Future<int> insertCategory(Category category) async {
     final db = await database;
     final existing = await getCategoryByName(category.name);
-    if (existing != null) throw Exception('A category with this name already exists');
+    if (existing != null)
+      throw Exception('A category with this name already exists');
     return db.insert(
       AppConstants.tableCategories,
       category.toMap()..remove('id'),

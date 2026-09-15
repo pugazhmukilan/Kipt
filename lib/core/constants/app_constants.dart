@@ -5,7 +5,7 @@ class AppConstants {
 
   // Database
   static const String databaseName = 'kipt.db';
-  static const int databaseVersion = 8;
+  static const int databaseVersion = 9;
 
   // Tables (v8 schema — field-based model with login titles)
   static const String tableItems = 'items';

@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'items_list_screen.dart';
 import '../../data/repositories/auth_service.dart';
 import '../../core/navigation/app_route_observer.dart';
+import '../../core/utils/image_picker_helper.dart';
 import '../bloc/item/item_bloc.dart';
 import '../bloc/item/item_event.dart';
 import 'auth_screen.dart';
@@ -58,10 +59,13 @@ class _HomeScreenState extends State<HomeScreen>
       _wasInBackground = true;
     }
 
-    // Re-authenticate when app comes back to foreground
+    // Re-authenticate when app comes back to foreground, unless the app was
+    // only backgrounded by an OS-native picker (camera / gallery / file),
+    // which is a normal flow inside the app, not the user leaving it.
     if (state == AppLifecycleState.resumed &&
         AuthService.isAppLockEnabled() &&
-        _wasInBackground) {
+        _wasInBackground &&
+        !ImagePickerHelper.isPickerActive) {
       _wasInBackground = false;
       _showAuthScreen();
     }

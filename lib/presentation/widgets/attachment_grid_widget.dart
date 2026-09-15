@@ -94,7 +94,7 @@ class _AttachmentTile extends StatelessWidget {
   void _viewAttachment(BuildContext context) {
     if (attachment.isPhoto) {
       Navigator.of(context).push(MaterialPageRoute(
-        builder: (_) => _FullScreenImage(path: attachment.path),
+        builder: (_) => FullScreenImageViewer(path: attachment.path),
       ));
     } else {
       // Open PDF via open_file or similar
@@ -168,9 +168,9 @@ class _TileAction extends StatelessWidget {
   }
 }
 
-class _FullScreenImage extends StatelessWidget {
+class FullScreenImageViewer extends StatelessWidget {
   final String path;
-  const _FullScreenImage({required this.path});
+  const FullScreenImageViewer({super.key, required this.path});
 
   @override
   Widget build(BuildContext context) {

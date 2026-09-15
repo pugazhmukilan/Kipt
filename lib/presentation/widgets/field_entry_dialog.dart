@@ -46,12 +46,12 @@ class _FieldEntryDialogState extends State<_FieldEntryDialog> {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     return AlertDialog(
-      insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-      constraints: const BoxConstraints(maxWidth: 560),
+      insetPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 24),
+      constraints: const BoxConstraints(maxWidth: 680),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      titlePadding: const EdgeInsets.fromLTRB(28, 24, 28, 12),
-      contentPadding: const EdgeInsets.fromLTRB(28, 0, 28, 12),
-      actionsPadding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+      titlePadding: const EdgeInsets.fromLTRB(28, 28, 28, 12),
+      contentPadding: const EdgeInsets.fromLTRB(28, 0, 28, 16),
+      actionsPadding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
       title: Row(
         children: [
           Icon(_iconFor(_field.fieldType), color: cs.primary),
@@ -127,12 +127,12 @@ class _LoginEntryDialogState extends State<_LoginEntryDialog> {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     return AlertDialog(
-      insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-      constraints: const BoxConstraints(maxWidth: 560),
+      insetPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 24),
+      constraints: const BoxConstraints(maxWidth: 680),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      titlePadding: const EdgeInsets.fromLTRB(28, 24, 28, 12),
-      contentPadding: const EdgeInsets.fromLTRB(28, 0, 28, 12),
-      actionsPadding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+      titlePadding: const EdgeInsets.fromLTRB(28, 28, 28, 12),
+      contentPadding: const EdgeInsets.fromLTRB(28, 0, 28, 16),
+      actionsPadding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
       title: Row(
         children: [
           Icon(Icons.lock_person_rounded, color: cs.tertiary),

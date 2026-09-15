@@ -19,6 +19,7 @@ import '../widgets/field_entry_dialog.dart';
 import '../widgets/field_slot.dart';
 import '../widgets/login_block_widget.dart';
 import '../widgets/tag_chip_input_widget.dart';
+import 'camera_screen.dart';
 
 /// Edit Item — same layout as Add Item, pre-filled (spec §3.4).
 class EditItemScreen extends StatefulWidget {
@@ -252,28 +253,27 @@ class _EditItemScreenState extends State<EditItemScreen> {
   // ---------------------------------------------------------------------------
 
   Future<void> _pickPhoto() async {
-    final path = await ImagePickerHelper.pick(
-      context,
-      ImageSource.gallery,
-    );
+    final path = await ImagePickerHelper.pick(context, ImageSource.gallery);
     if (path != null) setState(() => _newAttachmentPaths.add(path));
   }
 
   Future<void> _takePhoto() async {
-    final path = await ImagePickerHelper.pick(
-      context,
-      ImageSource.camera,
-    );
-    if (path != null) setState(() => _newAttachmentPaths.add(path));
+    final photo = await showCameraScreen(context);
+    if (photo != null) setState(() => _newAttachmentPaths.add(photo.path));
   }
 
   Future<void> _pickPdf() async {
-    final result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['pdf'],
-    );
-    if (result != null && result.files.single.path != null) {
-      setState(() => _newAttachmentPaths.add(result.files.single.path!));
+    ImagePickerHelper.isPickerActive = true;
+    try {
+      final result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['pdf'],
+      );
+      if (result != null && result.files.single.path != null) {
+        setState(() => _newAttachmentPaths.add(result.files.single.path!));
+      }
+    } finally {
+      ImagePickerHelper.endPickerSession();
     }
   }
 

@@ -4,6 +4,7 @@ import '../models/item_field.dart';
 import '../models/attachment.dart';
 import '../models/category.dart';
 import '../models/item_with_details.dart';
+import '../../core/utils/camera_aspect_ratio.dart';
 import 'secure_field_service.dart';
 import 'notification_service.dart';
 import 'image_storage_service.dart';
@@ -19,10 +20,10 @@ class ItemRepository {
     SecureFieldService? secureFieldService,
     NotificationService? notificationService,
     ImageStorageService? imageStorageService,
-  })  : _db = databaseHelper ?? DatabaseHelper(),
-        _secureField = secureFieldService ?? SecureFieldService(),
-        _notifications = notificationService ?? NotificationService(),
-        _imageStorage = imageStorageService ?? ImageStorageService();
+  }) : _db = databaseHelper ?? DatabaseHelper(),
+       _secureField = secureFieldService ?? SecureFieldService(),
+       _notifications = notificationService ?? NotificationService(),
+       _imageStorage = imageStorageService ?? ImageStorageService();
 
   // ---------------------------------------------------------------------------
   // Item operations
@@ -231,7 +232,8 @@ class ItemRepository {
   Future<List<Category>> getAllCategories() => _db.getAllCategories();
   Future<Category?> getCategoryById(int id) => _db.getCategoryById(id);
   Future<int> createCategory(Category category) => _db.insertCategory(category);
-  Future<void> updateCategory(Category category) => _db.updateCategory(category);
+  Future<void> updateCategory(Category category) =>
+      _db.updateCategory(category);
   Future<void> deleteCategory(int id) => _db.deleteCategory(id);
 
   // ---------------------------------------------------------------------------
@@ -323,22 +325,27 @@ class ItemRepository {
     }
   }
 
-  /// Saves attachment files from temporary paths to app storage.
-  Future<void> _saveAttachments(
-    int itemId,
-    List<String> paths,
-  ) async {
+  /// Saves attachment files from temporary paths to app storage. Photo
+  /// attachments get their width/height aspect ratio detected and stored so
+  /// the UI can display them in a matching frame.
+  Future<void> _saveAttachments(int itemId, List<String> paths) async {
     for (final path in paths) {
       final isPhoto = !path.toLowerCase().endsWith('.pdf');
       final mimetype = isPhoto ? 'image/jpeg' : 'application/pdf';
       final savedPath = await _imageStorage.saveImageFromPath(path);
-      await _db.insertAttachment(Attachment(
-        itemId: itemId,
-        path: savedPath,
-        isPhoto: isPhoto,
-        mimetype: mimetype,
-        addedAt: DateTime.now(),
-      ));
+      final ratio = isPhoto
+          ? await PhotoRatioUtils.readImageAspectRatio(savedPath)
+          : null;
+      await _db.insertAttachment(
+        Attachment(
+          itemId: itemId,
+          path: savedPath,
+          isPhoto: isPhoto,
+          mimetype: mimetype,
+          addedAt: DateTime.now(),
+          aspectRatio: ratio,
+        ),
+      );
     }
   }
 }
