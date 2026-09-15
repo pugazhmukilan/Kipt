@@ -313,7 +313,8 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                     item.item.title,
                     style: const TextStyle(
                       fontSize: 28,
-                      fontWeight: FontWeight.w700,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: -0.4,
                       height: 1.2,
                     ),
                   ),
@@ -407,7 +408,8 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
                         color: cs.surfaceContainerLow,
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(18),
+                        border: Border.all(color: cs.outlineVariant),
                       ),
                       child: Text(
                         item.item.notes!,
@@ -553,24 +555,33 @@ class _NearestExpiryHighlight extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       decoration: BoxDecoration(
         color: bgColor,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(18),
       ),
-      child: Column(
+      child: Row(
         children: [
-          Icon(icon, size: 36, color: iconColor),
-          const SizedBox(height: 12),
-          Text(
-            text,
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: cs.onSurface,
-              height: 1.3,
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: bgColor.withValues(alpha: 0.6),
+              borderRadius: BorderRadius.circular(14),
             ),
-            textAlign: TextAlign.center,
+            child: Icon(icon, size: 24, color: iconColor),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Text(
+              text,
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+                color: cs.onSurface,
+                height: 1.3,
+              ),
+            ),
           ),
         ],
       ),
@@ -584,12 +595,14 @@ class _SectionLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Text(
-      label,
+      label.toUpperCase(),
       style: TextStyle(
-        fontSize: 18,
+        fontSize: 12,
         fontWeight: FontWeight.w700,
-        color: Theme.of(context).colorScheme.onSurface,
+        letterSpacing: 1.1,
+        color: cs.onSurfaceVariant,
       ),
     );
   }

@@ -503,7 +503,7 @@ class _EditItemScreenState extends State<EditItemScreen> {
       decoration: InputDecoration(
         fillColor: cs.surfaceContainerLow,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(14),
           borderSide: BorderSide(color: cs.outlineVariant),
         ),
       ),
@@ -567,12 +567,12 @@ class _SectionLabel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Text(
-      label,
+      label.toUpperCase(),
       style: TextStyle(
-        fontSize: 14,
-        fontWeight: FontWeight.w600,
-        color: Theme.of(context).colorScheme.primary,
-        letterSpacing: 0.5,
+        fontSize: 12,
+        fontWeight: FontWeight.w700,
+        letterSpacing: 1.1,
+        color: Theme.of(context).colorScheme.onSurfaceVariant,
       ),
     );
   }

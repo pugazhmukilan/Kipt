@@ -186,21 +186,29 @@ class _ItemsListScreenState extends State<ItemsListScreen> {
         mainAxisSize: MainAxisSize.min,
         children: [
           ClipRRect(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(10),
             child: Image.asset(
               'assets/logo.png',
-              width: 26,
-              height: 26,
+              width: 34,
+              height: 34,
               fit: BoxFit.cover,
               errorBuilder: (context, error, stackTrace) => Icon(
                 Icons.inventory_2_rounded,
-                size: 26,
+                size: 34,
                 color: cs.primary,
               ),
             ),
           ),
-          const SizedBox(width: 10),
-          const Text('Kipt', style: TextStyle(fontWeight: FontWeight.w700)),
+          const SizedBox(width: 12),
+          Text(
+            'Kipt',
+            style: TextStyle(
+              fontSize: 26,
+              fontWeight: FontWeight.w800,
+              letterSpacing: -0.5,
+              color: cs.onSurface,
+            ),
+          ),
         ],
       ),
       actions: [
@@ -388,18 +396,25 @@ class _ItemCard extends StatelessWidget {
         clipBehavior: Clip.none,
         children: [
           Container(
-            margin: const EdgeInsets.only(bottom: 10),
+            margin: const EdgeInsets.only(bottom: 12),
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
               color: cs.surfaceContainerLow,
-              borderRadius: BorderRadius.circular(18),
-              border: Border.all(color: cs.outlineVariant.withValues(alpha: 0.5)),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: cs.outlineVariant),
+              boxShadow: [
+                BoxShadow(
+                  color: cs.shadow.withValues(alpha: 0.04),
+                  blurRadius: 14,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
             child: Row(
               children: [
                 // Thumbnail
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(14),
                   child: _Thumbnail(attachment: item.firstPhoto, cs: cs),
                 ),
                 const SizedBox(width: 14),
@@ -415,7 +430,7 @@ class _ItemCard extends StatelessWidget {
                               item.item.title,
                               style: const TextStyle(
                                 fontSize: 16,
-                                fontWeight: FontWeight.w600,
+                                fontWeight: FontWeight.w700,
                               ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -424,7 +439,7 @@ class _ItemCard extends StatelessWidget {
                         ],
                       ),
                       if (item.categoryName != null) ...[
-                        const SizedBox(height: 2),
+                        const SizedBox(height: 3),
                         Text(
                           item.categoryName!,
                           style: TextStyle(
@@ -470,8 +485,8 @@ class _Thumbnail extends StatelessWidget {
   Widget build(BuildContext context) {
     if (attachment == null) {
       return Container(
-        width: 56,
-        height: 56,
+        width: 60,
+        height: 60,
         color: cs.surfaceContainerHigh,
         child: Icon(
           Icons.inventory_2_rounded,
@@ -483,15 +498,15 @@ class _Thumbnail extends StatelessWidget {
     final file = File(attachment!.path as String);
     if (!file.existsSync()) {
       return Container(
-        width: 56,
-        height: 56,
+        width: 60,
+        height: 60,
         color: cs.surfaceContainerHigh,
         child: Icon(Icons.broken_image_outlined, color: cs.onSurfaceVariant),
       );
     }
     return SizedBox(
-      width: 56,
-      height: 56,
+      width: 60,
+      height: 60,
       child: Image.file(file, fit: BoxFit.cover),
     );
   }

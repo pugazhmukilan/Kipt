@@ -24,19 +24,19 @@ import '../models/item_with_details.dart';
 /// Photos are laid out in a 2-per-row grid, and any attached PDFs are
 /// rasterized page by page so the whole export is one self-contained PDF file.
 class ItemPdfService {
-  // Brand palette — warm paper + sage-green accent (matches the app theme).
-  static const _ink = PdfColor.fromInt(0xFF4A453D);
-  static const _inkMid = PdfColor.fromInt(0xFF8C8776);
-  static const _inkFaint = PdfColor.fromInt(0xFFB3AC9C);
-  static const _subtle = PdfColor.fromInt(0xFFF2EEE6);
-  static const _border = PdfColor.fromInt(0xFFDED7CB);
-  static const _accent = PdfColor.fromInt(0xFF7FA37A);
-  static const _accentDeep = PdfColor.fromInt(0xFF3D5A3A);
-  static const _accentBg = PdfColor.fromInt(0xFFE9F2E8);
-  static const _tagBg = PdfColor.fromInt(0xFFF4F0E9);
-  static const _tagBorder = PdfColor.fromInt(0xFFD6CFC2);
-  static const _passwordAccent = PdfColor.fromInt(0xFFD99A44);
-  static const _passwordBg = PdfColor.fromInt(0xFFFBF1E2);
+  // Brand palette — clean white paper + teal accent (matches the app theme).
+  static const _ink = PdfColor.fromInt(0xFF1B2221);
+  static const _inkMid = PdfColor.fromInt(0xFF5E6B69);
+  static const _inkFaint = PdfColor.fromInt(0xFF93A09D);
+  static const _subtle = PdfColor.fromInt(0xFFF3F7F6);
+  static const _border = PdfColor.fromInt(0xFFDCE7E5);
+  static const _accent = PdfColor.fromInt(0xFF39A099);
+  static const _accentDeep = PdfColor.fromInt(0xFF0C5450);
+  static const _accentBg = PdfColor.fromInt(0xFFD9EFED);
+  static const _tagBg = PdfColor.fromInt(0xFFEDF4F3);
+  static const _tagBorder = PdfColor.fromInt(0xFFC9DCD9);
+  static const _passwordAccent = PdfColor.fromInt(0xFFB67D1E);
+  static const _passwordBg = PdfColor.fromInt(0xFFFAF0DC);
   static const _maskedPassword = '******** (protected)';
 
   /// Photos rendered per page (2 columns x 3 rows).

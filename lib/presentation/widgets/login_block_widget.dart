@@ -75,8 +75,8 @@ class _LoginBlockWidgetState extends State<LoginBlockWidget> {
       decoration: widget.showContainer
           ? BoxDecoration(
               color: cs.surfaceContainerLow,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: cs.outlineVariant, width: 1),
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: cs.outlineVariant),
             )
           : null,
       child: Column(

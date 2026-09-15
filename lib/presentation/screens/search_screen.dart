@@ -66,24 +66,41 @@ class _SearchScreenState extends State<SearchScreen> {
       backgroundColor: cs.surface,
       appBar: AppBar(
         titleSpacing: 0,
-        title: TextField(
-          controller: _searchController,
-          focusNode: _focusNode,
-          decoration: InputDecoration(
-            hintText: 'Search title, tags, or fields...',
-            border: InputBorder.none,
-            suffixIcon: _searchController.text.isNotEmpty
-                ? IconButton(
-                    icon: const Icon(Icons.clear_rounded),
-                    onPressed: () {
-                      _searchController.clear();
-                      _onSearchChanged('');
-                    },
-                  )
-                : null,
+        title: Padding(
+          padding: const EdgeInsets.only(right: 16),
+          child: Container(
+            height: 44,
+            decoration: BoxDecoration(
+              color: cs.surfaceContainerHigh,
+              borderRadius: BorderRadius.circular(22),
+            ),
+            child: TextField(
+              controller: _searchController,
+              focusNode: _focusNode,
+              decoration: InputDecoration(
+                hintText: 'Search title, tags, or fields...',
+                hintStyle: TextStyle(color: cs.onSurfaceVariant),
+                icon: Padding(
+                  padding: const EdgeInsets.only(left: 14),
+                  child: Icon(Icons.search_rounded, size: 20, color: cs.onSurfaceVariant),
+                ),
+                suffixIcon: _searchController.text.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear_rounded),
+                        onPressed: () {
+                          _searchController.clear();
+                          _onSearchChanged('');
+                        },
+                      )
+                    : null,
+                contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                border: InputBorder.none,
+                fillColor: Colors.transparent,
+              ),
+              onChanged: _onSearchChanged,
+              textInputAction: TextInputAction.search,
+            ),
           ),
-          onChanged: _onSearchChanged,
-          textInputAction: TextInputAction.search,
         ),
       ),
       body: BlocBuilder<ItemBloc, ItemState>(
@@ -180,17 +197,24 @@ class _SearchResultCard extends StatelessWidget {
         clipBehavior: Clip.none,
         children: [
           Container(
-        margin: const EdgeInsets.only(bottom: 10),
+        margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
           color: cs.surfaceContainerLow,
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: cs.outlineVariant.withValues(alpha: 0.5)),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: cs.outlineVariant),
+          boxShadow: [
+            BoxShadow(
+              color: cs.shadow.withValues(alpha: 0.04),
+              blurRadius: 14,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
         child: Row(
           children: [
             ClipRRect(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(14),
               child: _Thumbnail(
                 attachment: item.firstPhoto,
                 cs: cs,
@@ -208,7 +232,7 @@ class _SearchResultCard extends StatelessWidget {
                           item.item.title,
                           style: const TextStyle(
                             fontSize: 16,
-                            fontWeight: FontWeight.w600,
+                            fontWeight: FontWeight.w700,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -217,7 +241,7 @@ class _SearchResultCard extends StatelessWidget {
                     ],
                   ),
                   if (item.categoryName != null) ...[
-                    const SizedBox(height: 2),
+                    const SizedBox(height: 3),
                     Text(
                       item.categoryName!,
                       style: TextStyle(
@@ -262,8 +286,8 @@ class _Thumbnail extends StatelessWidget {
   Widget build(BuildContext context) {
     if (attachment == null) {
       return Container(
-        width: 56,
-        height: 56,
+        width: 60,
+        height: 60,
         color: cs.surfaceContainerHigh,
         child: Icon(Icons.inventory_2_rounded, color: cs.onSurfaceVariant, size: 26),
       );
@@ -271,15 +295,15 @@ class _Thumbnail extends StatelessWidget {
     final file = File(attachment!.path as String);
     if (!file.existsSync()) {
       return Container(
-        width: 56,
-        height: 56,
+        width: 60,
+        height: 60,
         color: cs.surfaceContainerHigh,
         child: Icon(Icons.broken_image_outlined, color: cs.onSurfaceVariant),
       );
     }
     return SizedBox(
-      width: 56,
-      height: 56,
+      width: 60,
+      height: 60,
       child: Image.file(file, fit: BoxFit.cover),
     );
   }

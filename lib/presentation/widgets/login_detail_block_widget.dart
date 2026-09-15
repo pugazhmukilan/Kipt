@@ -25,7 +25,8 @@ class LoginDetailBlock extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
         color: cs.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: cs.outlineVariant),
       ),
       child: Column(
         children: [

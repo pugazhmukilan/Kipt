@@ -133,14 +133,14 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
               child: SizedBox(
                 width: double.infinity,
-                height: 48,
+                height: 52,
                 child: ElevatedButton(
                   onPressed: _nextPage,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: colorScheme.primary,
                     foregroundColor: colorScheme.onPrimary,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(100),
                     ),
                     elevation: 0,
                   ),
@@ -148,7 +148,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     _currentPage == _pages.length - 1 ? 'Get Started' : 'Continue',
                     style: const TextStyle(
                       fontSize: 16,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
                 ),

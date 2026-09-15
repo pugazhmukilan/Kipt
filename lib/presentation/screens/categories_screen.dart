@@ -164,48 +164,22 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
           : _categories.isEmpty
               ? const Center(child: Text('No categories found'))
               : ListView.builder(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 100),
                   itemCount: _categories.length,
                   itemBuilder: (context, index) {
                     final category = _categories[index];
                     
                     return Card(
-                      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                      color: cs.surfaceContainerLow,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        side: BorderSide(color: cs.outlineVariant),
-                      ),
-                      child: ListTile(
-                        title: Text(
-                          category.name,
-                          style: const TextStyle(fontWeight: FontWeight.w600),
-                        ),
-                        subtitle: category.isPreset
-                            ? const Text('Preset', style: TextStyle(fontSize: 12))
-                            : null,
-                        trailing: category.isPreset
-                            ? Icon(Icons.lock_outline, color: cs.onSurfaceVariant, size: 20)
-                            : PopupMenuButton<String>(
-                                onSelected: (value) {
-                                  if (value == 'edit') {
-                                    _showAddEditDialog(category: category);
-                                  } else if (value == 'delete') {
-                                    _deleteCategory(category);
-                                  }
-                                },
-                                itemBuilder: (context) => [
-                                  const PopupMenuItem(
-                                    value: 'edit',
-                                    child: Text('Edit'),
-                                  ),
-                                  const PopupMenuItem(
-                                    value: 'delete',
-                                    child: Text('Delete', style: TextStyle(color: Colors.red)),
-                                  ),
-                                ],
-                              ),
+                      margin: const EdgeInsets.only(bottom: 10),
+                      child: _CategoryRow(
+                        category: category,
+                        cs: cs,
+                        onEdit: category.isPreset
+                            ? null
+                            : () => _showAddEditDialog(category: category),
+                        onDelete: category.isPreset
+                            ? null
+                            : () => _deleteCategory(category),
                       ),
                     );
                   },
@@ -215,6 +189,61 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
         icon: const Icon(Icons.add_rounded),
         label: const Text('Add Category'),
       ),
+    );
+  }
+}
+
+class _CategoryRow extends StatelessWidget {
+  final Category category;
+  final ColorScheme cs;
+  final VoidCallback? onEdit;
+  final VoidCallback? onDelete;
+
+  const _CategoryRow({
+    required this.category,
+    required this.cs,
+    this.onEdit,
+    this.onDelete,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      leading: Container(
+        width: 40,
+        height: 40,
+        decoration: BoxDecoration(
+          color: cs.primaryContainer,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Icon(Icons.folder_rounded, size: 20, color: cs.onPrimaryContainer),
+      ),
+      title: Text(category.name, style: const TextStyle(fontWeight: FontWeight.w600)),
+      subtitle: category.isPreset
+          ? const Text('Preset', style: TextStyle(fontSize: 12))
+          : const Text('Custom', style: TextStyle(fontSize: 12)),
+      trailing: category.isPreset
+          ? Icon(Icons.lock_outline, color: cs.onSurfaceVariant, size: 20)
+          : PopupMenuButton<String>(
+              onSelected: (value) {
+                if (value == 'edit') {
+                  onEdit?.call();
+                } else if (value == 'delete') {
+                  onDelete?.call();
+                }
+              },
+              itemBuilder: (context) => [
+                const PopupMenuItem(
+                  value: 'edit',
+                  child: Text('Edit'),
+                ),
+                const PopupMenuItem(
+                  value: 'delete',
+                  child: Text('Delete', style: TextStyle(color: Colors.red)),
+                ),
+              ],
+            ),
     );
   }
 }

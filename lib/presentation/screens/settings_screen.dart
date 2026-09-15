@@ -99,22 +99,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
               children: [
                 _buildSectionHeader('Backup & Restore'),
                 Card(
-                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                   child: Column(
                     children: [
-                      ListTile(
-                        leading: const Icon(Icons.cloud_upload_outlined),
-                        title: const Text('Export Backup'),
-                        subtitle: Text('Last backup: $_lastBackupDate'),
-                        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                      _SettingTile(
+                        icon: Icons.cloud_upload_outlined,
+                        iconColor: Colors.green.shade600,
+                        title: 'Export Backup',
+                        subtitle: 'Last backup: $_lastBackupDate',
                         onTap: _exportBackup,
                       ),
-                      const Divider(height: 1),
-                      ListTile(
-                        leading: const Icon(Icons.cloud_download_outlined),
-                        title: const Text('Import Backup'),
-                        subtitle: const Text('Restore from backup file'),
-                        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                      const Divider(height: 1, indent: 72),
+                      _SettingTile(
+                        icon: Icons.cloud_download_outlined,
+                        iconColor: Colors.blue.shade600,
+                        title: 'Import Backup',
+                        subtitle: 'Restore from backup file',
                         onTap: _importBackup,
                       ),
                     ],
@@ -123,14 +123,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 
                 _buildSectionHeader('Preferences'),
                 Card(
-                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                   child: Column(
                     children: [
-                      ListTile(
-                        leading: const Icon(Icons.category_outlined),
-                        title: const Text('Manage Categories'),
-                        subtitle: const Text('Add, edit, or delete categories'),
-                        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                      _SettingTile(
+                        icon: Icons.category_outlined,
+                        iconColor: Colors.purple.shade500,
+                        title: 'Manage Categories',
+                        subtitle: 'Add, edit, or delete categories',
                         onTap: () async {
                           await Navigator.of(context).push(
                             MaterialPageRoute(
@@ -139,17 +139,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           );
                         },
                       ),
-                      const Divider(height: 1),
-                      ListTile(
-                        leading: const Icon(Icons.contrast_outlined),
-                        title: const Text('Theme'),
-                        subtitle: Text(_themeModeLabel(context)),
-                        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                      const Divider(height: 1, indent: 72),
+                      _SettingTile(
+                        icon: Icons.contrast_outlined,
+                        iconColor: Colors.indigo.shade500,
+                        title: 'Theme',
+                        subtitle: _themeModeLabel(context),
                         onTap: _changeThemeMode,
                       ),
-                      const Divider(height: 1),
+                      const Divider(height: 1, indent: 72),
                       SwitchListTile(
-                        secondary: const Icon(Icons.notifications_outlined),
+                        secondary: _IconTile(
+                          icon: Icons.notifications_outlined,
+                          color: Colors.orange.shade600,
+                        ),
                         title: const Text('Notifications'),
                         subtitle: const Text('Reminders for expiring dates'),
                         value: _notificationsEnabled,
@@ -160,12 +163,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           PreferencesHelper.setNotificationEnabled(value);
                         },
                       ),
-                      const Divider(height: 1),
-                      ListTile(
-                        leading: const Icon(Icons.timer_outlined),
-                        title: const Text('Default Reminder Lead Time'),
-                        subtitle: Text('$_defaultLeadDays days before expiry'),
-                        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                      const Divider(height: 1, indent: 72),
+                      _SettingTile(
+                        icon: Icons.timer_outlined,
+                        iconColor: Colors.teal.shade600,
+                        title: 'Default Reminder Lead Time',
+                        subtitle: '$_defaultLeadDays days before expiry',
                         onTap: _changeDefaultLeadDays,
                       ),
                     ],
@@ -174,14 +177,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 
                 _buildSectionHeader('Security'),
                 Card(
-                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                   child: FutureBuilder<bool>(
                     future: AuthService().isAuthenticationAvailable(),
                     builder: (context, snapshot) {
                       final isAvailable = snapshot.data ?? false;
-                      
+
                       return SwitchListTile(
-                        secondary: const Icon(Icons.lock_outline),
+                        secondary: _IconTile(
+                          icon: Icons.lock_outline,
+                          color: Colors.red.shade500,
+                        ),
                         title: const Text('App Lock'),
                         subtitle: Text(
                           isAvailable
@@ -235,19 +241,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 
                 _buildSectionHeader('About'),
                 Card(
-                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                   child: Column(
                     children: [
-                      ListTile(
-                        leading: const Icon(Icons.info_outline),
-                        title: const Text('App Version'),
-                        subtitle: Text(AppConstants.appVersion),
+                      _SettingTile(
+                        icon: Icons.info_outline,
+                        iconColor: Colors.teal.shade600,
+                        title: 'App Version',
+                        subtitle: AppConstants.appVersion,
+                        showChevron: false,
                       ),
-                      const Divider(height: 1),
-                      ListTile(
-                        leading: const Icon(Icons.description_outlined),
-                        title: const Text('About Kipt'),
-                        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                      const Divider(height: 1, indent: 72),
+                      _SettingTile(
+                        icon: Icons.description_outlined,
+                        iconColor: Colors.blue.shade600,
+                        title: 'About Kipt',
+                        subtitle: 'Design, usage tips and privacy',
                         onTap: () {
                           Navigator.of(context).push(
                             MaterialPageRoute(
@@ -271,12 +280,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget _buildSectionHeader(String title) {
     final colorScheme = Theme.of(context).colorScheme;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
+      padding: const EdgeInsets.fromLTRB(20, 28, 20, 10),
       child: Text(
-        title,
+        title.toUpperCase(),
         style: TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
+          fontSize: 12,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 1.1,
           color: colorScheme.onSurfaceVariant,
         ),
       ),
@@ -480,6 +490,61 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ],
         );
       },
+    );
+  }
+}
+
+/// One UI-style settings row: leading icon tile, title, subtitle, chevron.
+class _SettingTile extends StatelessWidget {
+  final IconData icon;
+  final Color iconColor;
+  final String title;
+  final String subtitle;
+  final VoidCallback? onTap;
+  final bool showChevron;
+
+  const _SettingTile({
+    required this.icon,
+    required this.iconColor,
+    required this.title,
+    required this.subtitle,
+    this.onTap,
+    this.showChevron = true,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    return ListTile(
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+      leading: _IconTile(icon: icon, color: iconColor),
+      title: Text(title),
+      subtitle: Text(subtitle),
+      trailing: showChevron
+          ? Icon(Icons.chevron_right_rounded, size: 20, color: cs.outline)
+          : null,
+      onTap: onTap,
+    );
+  }
+}
+
+/// Rounded colored tile behind a settings icon.
+class _IconTile extends StatelessWidget {
+  final IconData icon;
+  final Color color;
+
+  const _IconTile({required this.icon, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 40,
+      height: 40,
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.14),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Icon(icon, size: 22, color: color),
     );
   }
 }
