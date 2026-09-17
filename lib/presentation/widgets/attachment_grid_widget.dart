@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_gallery_saver_plus/image_gallery_saver_plus.dart';
 import 'package:share_plus/share_plus.dart';
 import '../../data/models/attachment.dart';
 
@@ -172,6 +173,38 @@ class FullScreenImageViewer extends StatelessWidget {
   final String path;
   const FullScreenImageViewer({super.key, required this.path});
 
+  Future<void> _share(BuildContext context) async {
+    await Share.shareXFiles(
+      [XFile(path)],
+      subject: 'Kipt photo',
+    );
+  }
+
+  Future<void> _download(BuildContext context) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final file = File(path);
+    final name = file.uri.pathSegments.last;
+    messenger.showSnackBar(
+      const SnackBar(content: Text('Saving photo…')),
+    );
+    try {
+      final result = await ImageGallerySaverPlus.saveFile(path, name: name);
+      final isSuccess = result is Map && result['isSuccess'] == true;
+      messenger.hideCurrentSnackBar();
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(isSuccess ? 'Photo saved to gallery' : 'Could not save photo'),
+        ),
+      );
+    } catch (_) {
+      if (!context.mounted) return;
+      messenger.hideCurrentSnackBar();
+      messenger.showSnackBar(
+        const SnackBar(content: Text('Could not save photo')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -180,6 +213,19 @@ class FullScreenImageViewer extends StatelessWidget {
         backgroundColor: Colors.black,
         foregroundColor: Colors.white,
         elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.download_rounded),
+            tooltip: 'Download',
+            onPressed: () => _download(context),
+          ),
+          IconButton(
+            icon: const Icon(Icons.share_rounded),
+            tooltip: 'Share',
+            onPressed: () => _share(context),
+          ),
+          const SizedBox(width: 8),
+        ],
       ),
       body: Center(
         child: InteractiveViewer(

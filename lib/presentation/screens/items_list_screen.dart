@@ -1,19 +1,16 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../core/spacing.dart';
 import '../../data/models/category.dart';
-import '../../data/models/item_field.dart';
 import '../../data/models/item_with_details.dart';
 import '../../data/repositories/item_repository.dart';
 import '../bloc/item/item_bloc.dart';
 import '../bloc/item/item_event.dart';
 import '../bloc/item/item_state.dart';
 import '../widgets/dashboard_stats_widget.dart';
-import '../widgets/favorite_seal_widget.dart';
-import '../widgets/status_badge_widget.dart';
+import '../widgets/item_card_widget.dart';
 import 'add_item_screen.dart';
 import 'item_detail_screen.dart';
-import 'search_screen.dart';
 import 'settings_screen.dart';
 
 class ItemsListScreen extends StatefulWidget {
@@ -31,6 +28,8 @@ class ItemsListScreen extends StatefulWidget {
 }
 
 class _ItemsListScreenState extends State<ItemsListScreen> {
+  final _searchController = TextEditingController();
+  final _searchFocusNode = FocusNode();
   List<Category> _categories = [];
   int? _activeCategoryId;
 
@@ -48,6 +47,13 @@ class _ItemsListScreenState extends State<ItemsListScreen> {
     _loadCategories();
   }
 
+  @override
+  void dispose() {
+    _searchController.dispose();
+    _searchFocusNode.dispose();
+    super.dispose();
+  }
+
   Future<void> _loadCategories() async {
     final cats = await context.read<ItemRepository>().getAllCategories();
     if (mounted) setState(() => _categories = cats);
@@ -55,6 +61,15 @@ class _ItemsListScreenState extends State<ItemsListScreen> {
 
   void _reload() {
     context.read<ItemBloc>().add(const LoadItems());
+  }
+
+  void _onSearchChanged(String query) {
+    final trimmedQuery = query.trim();
+    if (trimmedQuery.isEmpty) {
+      context.read<ItemBloc>().add(const LoadItems());
+    } else {
+      context.read<ItemBloc>().add(SearchItems(trimmedQuery));
+    }
   }
 
   /// Requests the full list once (cold start only). Never re-dispatches once
@@ -79,6 +94,12 @@ class _ItemsListScreenState extends State<ItemsListScreen> {
 
     return Scaffold(
       backgroundColor: cs.surface,
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _openAddItem,
+        icon: const Icon(Icons.add_rounded),
+        label: const Text('Add Item'),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       body: BlocConsumer<ItemBloc, ItemState>(
         listener: (context, state) {
           if (state is ItemOperationSuccess) {
@@ -123,19 +144,39 @@ class _ItemsListScreenState extends State<ItemsListScreen> {
             );
           } else if (hasData && items.isNotEmpty) {
             content = SliverPadding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 100),
+              padding: EdgeInsets.fromLTRB(
+                AppSpacing.pageMargin,
+                AppSpacing.searchBarVertical,
+                AppSpacing.pageMargin,
+                AppSpacing.massive + AppSpacing.fabMargin,
+              ),
               sliver: SliverList(
                 delegate: SliverChildBuilderDelegate(
-                  (context, index) => _ItemCard(
-                    item: items[index],
-                    onTap: () => _openDetail(items[index]),
+                  (context, index) => Padding(
+                    padding: EdgeInsets.only(bottom: AppSpacing.listItemGap),
+                    child: ItemCard(
+                      item: items[index],
+                      onTap: () => _openDetail(items[index]),
+                    ),
                   ),
                   childCount: items.length,
                 ),
               ),
             );
+          } else if (state is ItemSearchResults && state.query.isNotEmpty) {
+            content = SliverFillRemaining(
+              child: _NoSearchResultsState(
+                onClear: () {
+                  _searchController.clear();
+                  _onSearchChanged('');
+                  _searchFocusNode.requestFocus();
+                },
+              ),
+            );
           } else if (hasData) {
-            content = SliverFillRemaining(child: _EmptyState());
+            content = SliverFillRemaining(
+              child: _EmptyState(onAdd: _openAddItem),
+            );
           } else {
             // Cold start (ItemInitial) — request the list and show a spinner.
             // Never shows a blank/empty state on the very first frame.
@@ -150,15 +191,68 @@ class _ItemsListScreenState extends State<ItemsListScreen> {
               _buildAppBar(context, cs),
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+                  child: TextField(
+                    controller: _searchController,
+                    focusNode: _searchFocusNode,
+                    onChanged: _onSearchChanged,
+                    textInputAction: TextInputAction.search,
+                    decoration: InputDecoration(
+                      hintText: 'Search your items',
+                      prefixIcon: const Icon(Icons.search_rounded),
+                      suffixIcon: _searchController.text.isNotEmpty
+                          ? IconButton(
+                              onPressed: () {
+                                _searchController.clear();
+                                _onSearchChanged('');
+                                setState(() {});
+                              },
+                              icon: const Icon(Icons.clear_rounded),
+                              tooltip: 'Clear search',
+                            )
+                          : null,
+                    ),
+                  ),
+                ),
+              ),
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: EdgeInsets.fromLTRB(
+                    AppSpacing.pageMargin,
+                    AppSpacing.searchBarVertical,
+                    AppSpacing.pageMargin,
+                    0,
+                  ),
                   child: DashboardStatsWidget(stats: stats),
                 ),
               ),
               SliverToBoxAdapter(
-                child: _CategoryFilterRow(
-                  categories: _categories,
-                  activeCategoryId: _activeCategoryId,
-                  onCategorySelected: _onCategorySelected,
+                child: Padding(
+                  padding: EdgeInsets.only(
+                    top: AppSpacing.lg,
+                    left: AppSpacing.pageMargin,
+                    right: AppSpacing.pageMargin,
+                    bottom: AppSpacing.md,
+                  ),
+                  child: _CategoryFilterRow(
+                    categories: _categories,
+                    activeCategoryId: _activeCategoryId,
+                    onCategorySelected: _onCategorySelected,
+                  ),
+                ),
+              ),
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: EdgeInsets.fromLTRB(
+                    AppSpacing.pageMargin,
+                    AppSpacing.sm,
+                    AppSpacing.pageMargin,
+                    AppSpacing.md,
+                  ),
+                  child: Text(
+                    'Your items',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
                 ),
               ),
               content,
@@ -166,12 +260,6 @@ class _ItemsListScreenState extends State<ItemsListScreen> {
           );
         },
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _openAddItem,
-        icon: const Icon(Icons.add_rounded),
-        label: const Text('Add Item'),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 
@@ -181,31 +269,27 @@ class _ItemsListScreenState extends State<ItemsListScreen> {
       pinned: false,
       backgroundColor: cs.surface,
       surfaceTintColor: Colors.transparent,
-      titleSpacing: 20,
+      titleSpacing: 16,
       title: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           ClipRRect(
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(8),
             child: Image.asset(
               'assets/logo.png',
-              width: 34,
-              height: 34,
+              width: 30,
+              height: 30,
               fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) => Icon(
-                Icons.inventory_2_rounded,
-                size: 34,
-                color: cs.primary,
-              ),
+              errorBuilder: (context, error, stackTrace) =>
+                  Icon(Icons.inventory_2_rounded, size: 30, color: cs.primary),
             ),
           ),
           const SizedBox(width: 12),
           Text(
             'Kipt',
             style: TextStyle(
-              fontSize: 26,
-              fontWeight: FontWeight.w800,
-              letterSpacing: -0.5,
+              fontSize: 22,
+              fontWeight: FontWeight.w700,
               color: cs.onSurface,
             ),
           ),
@@ -213,16 +297,11 @@ class _ItemsListScreenState extends State<ItemsListScreen> {
       ),
       actions: [
         IconButton(
-          icon: const Icon(Icons.search_rounded),
-          onPressed: _openSearch,
-          tooltip: 'Search',
-        ),
-        IconButton(
           icon: const Icon(Icons.settings_rounded),
           onPressed: _openSettings,
           tooltip: 'Settings',
         ),
-        const SizedBox(width: 8),
+        const SizedBox(width: 4),
       ],
     );
   }
@@ -257,19 +336,9 @@ class _ItemsListScreenState extends State<ItemsListScreen> {
   }
 
   void _openAddItem() {
-    Navigator.of(
-      context,
-    ).push(MaterialPageRoute(builder: (_) => const AddItemScreen())).then(
-      (_) => _refreshAfterReturn(),
-    );
-  }
-
-  void _openSearch() {
-    Navigator.of(
-      context,
-    ).push(MaterialPageRoute(builder: (_) => const SearchScreen())).then(
-      (_) => _refreshAfterReturn(),
-    );
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (_) => const AddItemScreen()))
+        .then((_) => _refreshAfterReturn());
   }
 
   void _openSettings() {
@@ -285,10 +354,6 @@ class _ItemsListScreenState extends State<ItemsListScreen> {
   }
 }
 
-// ---------------------------------------------------------------------------
-// Category filter row
-// ---------------------------------------------------------------------------
-
 class _CategoryFilterRow extends StatelessWidget {
   final List<Category> categories;
   final int? activeCategoryId;
@@ -303,33 +368,29 @@ class _CategoryFilterRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    return Padding(
-      padding: const EdgeInsets.only(top: 16),
-      child: SizedBox(
-        height: 42,
-        child: ListView.separated(
-          scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          separatorBuilder: (_, _) => const SizedBox(width: 8),
-          itemCount: categories.length + 1,
-          itemBuilder: (context, index) {
-            if (index == 0) {
-              return _FilterChip(
-                label: 'All',
-                selected: activeCategoryId == null,
-                onTap: () => onCategorySelected(null),
-                cs: cs,
-              );
-            }
-            final cat = categories[index - 1];
+    return SizedBox(
+      height: 42,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        separatorBuilder: (_, _) => SizedBox(width: AppSpacing.chipGap),
+        itemCount: categories.length + 1,
+        itemBuilder: (context, index) {
+          if (index == 0) {
             return _FilterChip(
-              label: cat.name,
-              selected: activeCategoryId == cat.id,
-              onTap: () => onCategorySelected(cat.id),
+              label: 'All',
+              selected: activeCategoryId == null,
+              onTap: () => onCategorySelected(null),
               cs: cs,
             );
-          },
-        ),
+          }
+          final cat = categories[index - 1];
+          return _FilterChip(
+            label: cat.name,
+            selected: activeCategoryId == cat.id,
+            onTap: () => onCategorySelected(cat.id),
+            cs: cs,
+          );
+        },
       ),
     );
   }
@@ -355,11 +416,11 @@ class _FilterChip extends StatelessWidget {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         curve: Curves.easeOut,
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+        padding: EdgeInsets.symmetric(horizontal: AppSpacing.md),
         alignment: Alignment.center,
         decoration: BoxDecoration(
           color: selected ? cs.primary : cs.surfaceContainerHigh,
-          borderRadius: BorderRadius.circular(21),
+          borderRadius: BorderRadius.circular(10),
         ),
         child: Text(
           label,
@@ -375,197 +436,102 @@ class _FilterChip extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-// Item card
+// Empty / error states
 // ---------------------------------------------------------------------------
 
-class _ItemCard extends StatelessWidget {
-  final ItemWithDetails item;
-  final VoidCallback onTap;
+class _EmptyState extends StatelessWidget {
+  final VoidCallback onAdd;
 
-  const _ItemCard({required this.item, required this.onTap});
+  const _EmptyState({required this.onAdd});
 
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final nearest = item.nearestDateField;
-    final urgentStatus = item.mostUrgentStatus;
-
-    return GestureDetector(
-      onTap: onTap,
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          Container(
-            margin: const EdgeInsets.only(bottom: 12),
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: cs.surfaceContainerLow,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: cs.outlineVariant),
-              boxShadow: [
-                BoxShadow(
-                  color: cs.shadow.withValues(alpha: 0.04),
-                  blurRadius: 14,
-                  offset: const Offset(0, 4),
-                ),
-              ],
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: AppSpacing.xxxl),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 96,
+              height: 96,
+              decoration: BoxDecoration(
+                color: cs.surfaceContainerHigh,
+                borderRadius: BorderRadius.circular(28),
+              ),
+              child: Icon(
+                Icons.inventory_2_outlined,
+                size: 44,
+                color: cs.onSurfaceVariant.withValues(alpha: 0.5),
+              ),
             ),
-            child: Row(
-              children: [
-                // Thumbnail
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(14),
-                  child: _Thumbnail(attachment: item.firstPhoto, cs: cs),
-                ),
-                const SizedBox(width: 14),
-                // Content
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              item.item.title,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ],
-                      ),
-                      if (item.categoryName != null) ...[
-                        const SizedBox(height: 3),
-                        Text(
-                          item.categoryName!,
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: cs.onSurfaceVariant,
-                          ),
-                        ),
-                      ],
-                      if (nearest != null) ...[
-                        const SizedBox(height: 6),
-                        _NearestDateHint(field: nearest),
-                      ],
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 10),
-                // Status badge
-                if (urgentStatus != null && urgentStatus != FieldStatus.noReminder)
-                  StatusBadge(status: urgentStatus, compact: true),
-              ],
+            AppSpacing.xl.hBox,
+            Text(
+              'Nothing here yet',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: cs.onSurface,
+              ),
             ),
-          ),
-          // Wax-stamp logo for favorites, on top of the card's top-right corner.
-          if (item.item.favorite)
-            Positioned(
-              top: -12,
-              right: -10,
-              child: FavoriteSeal(),
+            AppSpacing.inlineGap.hBox,
+            Text(
+              'Add your first item to start tracking\nwarranties, receipts, and IDs.',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: cs.onSurfaceVariant, height: 1.4),
             ),
-        ],
+            AppSpacing.sectionGap.hBox,
+            FilledButton.icon(
+              onPressed: onAdd,
+              icon: const Icon(Icons.add_rounded),
+              label: const Text('Add your first item'),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
-class _Thumbnail extends StatelessWidget {
-  final dynamic attachment; // Attachment?
-  final ColorScheme cs;
+class _NoSearchResultsState extends StatelessWidget {
+  final VoidCallback onClear;
 
-  const _Thumbnail({required this.attachment, required this.cs});
+  const _NoSearchResultsState({required this.onClear});
 
-  @override
-  Widget build(BuildContext context) {
-    if (attachment == null) {
-      return Container(
-        width: 60,
-        height: 60,
-        color: cs.surfaceContainerHigh,
-        child: Icon(
-          Icons.inventory_2_rounded,
-          color: cs.onSurfaceVariant,
-          size: 26,
-        ),
-      );
-    }
-    final file = File(attachment!.path as String);
-    if (!file.existsSync()) {
-      return Container(
-        width: 60,
-        height: 60,
-        color: cs.surfaceContainerHigh,
-        child: Icon(Icons.broken_image_outlined, color: cs.onSurfaceVariant),
-      );
-    }
-    return SizedBox(
-      width: 60,
-      height: 60,
-      child: Image.file(file, fit: BoxFit.cover),
-    );
-  }
-}
-
-class _NearestDateHint extends StatelessWidget {
-  final ItemField field;
-  const _NearestDateHint({required this.field});
-
-  @override
-  Widget build(BuildContext context) {
-    final days = field.daysRemaining;
-    if (days == null) return const SizedBox.shrink();
-    final cs = Theme.of(context).colorScheme;
-    String text;
-    if (days < 0) {
-      text = '${field.label} expired ${days.abs()}d ago';
-    } else if (days == 0) {
-      text = '${field.label} expires today';
-    } else {
-      text = '${field.label} in ${days}d';
-    }
-    return Text(
-      text,
-      style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant),
-      maxLines: 1,
-      overflow: TextOverflow.ellipsis,
-    );
-  }
-}
-
-class _EmptyState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            Icons.inventory_2_outlined,
-            size: 64,
-            color: cs.onSurfaceVariant.withValues(alpha: 0.4),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'Nothing here yet',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: cs.onSurface,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.search_off_rounded,
+              size: 48,
+              color: cs.onSurfaceVariant,
             ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Tap + to add your first item',
-            style: TextStyle(color: cs.onSurfaceVariant),
-          ),
-        ],
+            const SizedBox(height: 16),
+            Text(
+              'No matching items',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Try a different title, category, or field.',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: cs.onSurfaceVariant),
+            ),
+            const SizedBox(height: 20),
+            OutlinedButton.icon(
+              onPressed: onClear,
+              icon: const Icon(Icons.refresh_rounded),
+              label: const Text('Clear search'),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -582,12 +548,12 @@ class _ErrorState extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
     return Center(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 32),
+        padding: EdgeInsets.symmetric(horizontal: AppSpacing.xxxl),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(Icons.error_outline_rounded, size: 56, color: cs.error),
-            const SizedBox(height: 16),
+            AppSpacing.lg.hBox,
             Text(
               'Could not load items',
               style: TextStyle(
@@ -596,13 +562,13 @@ class _ErrorState extends StatelessWidget {
                 color: cs.onSurface,
               ),
             ),
-            const SizedBox(height: 8),
+            AppSpacing.inlineGap.hBox,
             Text(
               message,
               style: TextStyle(color: cs.onSurfaceVariant),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 20),
+            AppSpacing.xl.hBox,
             FilledButton.icon(
               onPressed: onRetry,
               icon: const Icon(Icons.refresh_rounded),

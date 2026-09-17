@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import '../../core/spacing.dart';
 
 class LoadingIndicator extends StatelessWidget {
   final String? message;
-  
+
   const LoadingIndicator({super.key, this.message});
-  
+
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -13,7 +14,7 @@ class LoadingIndicator extends StatelessWidget {
         children: [
           const CircularProgressIndicator(),
           if (message != null) ...[
-            const SizedBox(height: 16),
+            AppSpacing.lg.hBox,
             Text(
               message!,
               style: Theme.of(context).textTheme.bodyMedium,
@@ -31,7 +32,7 @@ class EmptyState extends StatelessWidget {
   final String title;
   final String? subtitle;
   final Widget? action;
-  
+
   const EmptyState({
     super.key,
     required this.icon,
@@ -39,9 +40,10 @@ class EmptyState extends StatelessWidget {
     this.subtitle,
     this.action,
   });
-  
+
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32.0),
@@ -51,29 +53,29 @@ class EmptyState extends StatelessWidget {
             Icon(
               icon,
               size: 80,
-              color: Colors.grey[400],
+              color: cs.onSurfaceVariant.withValues(alpha: 0.35),
             ),
-            const SizedBox(height: 16),
+            AppSpacing.lg.hBox,
             Text(
               title,
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    color: Colors.grey[600],
+                    color: cs.onSurface,
                     fontWeight: FontWeight.w600,
                   ),
               textAlign: TextAlign.center,
             ),
             if (subtitle != null) ...[
-              const SizedBox(height: 8),
+              AppSpacing.inlineGap.hBox,
               Text(
                 subtitle!,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Colors.grey[500],
+                      color: cs.onSurfaceVariant,
                     ),
                 textAlign: TextAlign.center,
               ),
             ],
             if (action != null) ...[
-              const SizedBox(height: 24),
+              AppSpacing.sectionGap.hBox,
               action!,
             ],
           ],
@@ -86,15 +88,16 @@ class EmptyState extends StatelessWidget {
 class ErrorDisplay extends StatelessWidget {
   final String message;
   final VoidCallback? onRetry;
-  
+
   const ErrorDisplay({
     super.key,
     required this.message,
     this.onRetry,
   });
-  
+
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32.0),
@@ -104,24 +107,24 @@ class ErrorDisplay extends StatelessWidget {
             Icon(
               Icons.error_outline,
               size: 80,
-              color: Colors.red[400],
+              color: cs.error,
             ),
-            const SizedBox(height: 16),
+            AppSpacing.lg.hBox,
             Text(
               'Error',
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    color: Colors.red[600],
+                    color: cs.error,
                     fontWeight: FontWeight.w600,
                   ),
             ),
-            const SizedBox(height: 8),
+            AppSpacing.inlineGap.hBox,
             Text(
               message,
               style: Theme.of(context).textTheme.bodyMedium,
               textAlign: TextAlign.center,
             ),
             if (onRetry != null) ...[
-              const SizedBox(height: 24),
+              AppSpacing.sectionGap.hBox,
               ElevatedButton.icon(
                 onPressed: onRetry,
                 icon: const Icon(Icons.refresh_outlined),

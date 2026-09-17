@@ -6,6 +6,7 @@ import '../bloc/backup/backup_bloc.dart';
 import '../bloc/backup/backup_event.dart';
 import '../bloc/backup/backup_state.dart';
 import '../../core/constants/app_constants.dart';
+import '../../core/spacing.dart';
 import '../../core/utils/preferences_helper.dart';
 import '../widgets/common_widgets.dart';
 import '../bloc/theme/theme_cubit.dart';
@@ -47,6 +48,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Settings'),
@@ -99,12 +101,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
               children: [
                 _buildSectionHeader('Backup & Restore'),
                 Card(
-                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                  margin: EdgeInsets.symmetric(horizontal: AppSpacing.pageMargin, vertical: AppSpacing.xs),
                   child: Column(
                     children: [
                       _SettingTile(
                         icon: Icons.cloud_upload_outlined,
-                        iconColor: Colors.green.shade600,
+                        iconColor: cs.primary,
                         title: 'Export Backup',
                         subtitle: 'Last backup: $_lastBackupDate',
                         onTap: _exportBackup,
@@ -112,7 +114,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       const Divider(height: 1, indent: 72),
                       _SettingTile(
                         icon: Icons.cloud_download_outlined,
-                        iconColor: Colors.blue.shade600,
+                        iconColor: cs.secondary,
                         title: 'Import Backup',
                         subtitle: 'Restore from backup file',
                         onTap: _importBackup,
@@ -123,12 +125,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 
                 _buildSectionHeader('Preferences'),
                 Card(
-                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                  margin: EdgeInsets.symmetric(horizontal: AppSpacing.pageMargin, vertical: AppSpacing.xs),
                   child: Column(
                     children: [
                       _SettingTile(
                         icon: Icons.category_outlined,
-                        iconColor: Colors.purple.shade500,
+                        iconColor: cs.tertiary,
                         title: 'Manage Categories',
                         subtitle: 'Add, edit, or delete categories',
                         onTap: () async {
@@ -142,7 +144,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       const Divider(height: 1, indent: 72),
                       _SettingTile(
                         icon: Icons.contrast_outlined,
-                        iconColor: Colors.indigo.shade500,
+                        iconColor: cs.primary,
                         title: 'Theme',
                         subtitle: _themeModeLabel(context),
                         onTap: _changeThemeMode,
@@ -151,7 +153,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       SwitchListTile(
                         secondary: _IconTile(
                           icon: Icons.notifications_outlined,
-                          color: Colors.orange.shade600,
+                          color: cs.tertiary,
                         ),
                         title: const Text('Notifications'),
                         subtitle: const Text('Reminders for expiring dates'),
@@ -166,7 +168,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       const Divider(height: 1, indent: 72),
                       _SettingTile(
                         icon: Icons.timer_outlined,
-                        iconColor: Colors.teal.shade600,
+                        iconColor: cs.secondary,
                         title: 'Default Reminder Lead Time',
                         subtitle: '$_defaultLeadDays days before expiry',
                         onTap: _changeDefaultLeadDays,
@@ -177,7 +179,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 
                 _buildSectionHeader('Security'),
                 Card(
-                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                  margin: EdgeInsets.symmetric(horizontal: AppSpacing.pageMargin, vertical: AppSpacing.xs),
                   child: FutureBuilder<bool>(
                     future: AuthService().isAuthenticationAvailable(),
                     builder: (context, snapshot) {
@@ -186,7 +188,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       return SwitchListTile(
                         secondary: _IconTile(
                           icon: Icons.lock_outline,
-                          color: Colors.red.shade500,
+                          color: cs.error,
                         ),
                         title: const Text('App Lock'),
                         subtitle: Text(
@@ -241,12 +243,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 
                 _buildSectionHeader('About'),
                 Card(
-                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                  margin: EdgeInsets.symmetric(horizontal: AppSpacing.pageMargin, vertical: AppSpacing.xs),
                   child: Column(
                     children: [
                       _SettingTile(
                         icon: Icons.info_outline,
-                        iconColor: Colors.teal.shade600,
+                        iconColor: cs.primary,
                         title: 'App Version',
                         subtitle: AppConstants.appVersion,
                         showChevron: false,
@@ -254,7 +256,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       const Divider(height: 1, indent: 72),
                       _SettingTile(
                         icon: Icons.description_outlined,
-                        iconColor: Colors.blue.shade600,
+                        iconColor: cs.secondary,
                         title: 'About Kipt',
                         subtitle: 'Design, usage tips and privacy',
                         onTap: () {
@@ -268,7 +270,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 32),
+                AppSpacing.xxxl.hBox,
               ],
             );
           },
@@ -280,7 +282,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget _buildSectionHeader(String title) {
     final colorScheme = Theme.of(context).colorScheme;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 28, 20, 10),
+      padding: EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.xxxl, AppSpacing.xl, AppSpacing.md),
       child: Text(
         title.toUpperCase(),
         style: TextStyle(
@@ -516,7 +518,7 @@ class _SettingTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     return ListTile(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+      contentPadding: EdgeInsets.symmetric(horizontal: AppSpacing.pageMargin, vertical: AppSpacing.xs),
       leading: _IconTile(icon: icon, color: iconColor),
       title: Text(title),
       subtitle: Text(subtitle),

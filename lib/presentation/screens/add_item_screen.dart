@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:image_picker/image_picker.dart';
+import '../../core/spacing.dart';
 import '../../core/utils/image_picker_helper.dart';
 import '../../core/utils/preferences_helper.dart';
 import '../../data/models/category.dart';
@@ -254,7 +255,12 @@ class _AddItemScreenState extends State<AddItemScreen> {
       ),
       body: SingleChildScrollView(
         controller: _scrollController,
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
+        padding: EdgeInsets.fromLTRB(
+          AppSpacing.pageMargin,
+          AppSpacing.pageMargin,
+          AppSpacing.pageMargin,
+          AppSpacing.massive,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -273,26 +279,26 @@ class _AddItemScreenState extends State<AddItemScreen> {
                 contentPadding: EdgeInsets.zero,
               ),
             ),
-            const SizedBox(height: 24),
+            AppSpacing.sectionGap.hBox,
 
             // 2. Category
             _SectionLabel('Category'),
-            const SizedBox(height: 8),
+            AppSpacing.inlineGap.hBox,
             _buildCategorySelector(cs),
-            const SizedBox(height: 24),
+            AppSpacing.sectionGap.hBox,
 
             // 3. Tags
             _SectionLabel('Tags'),
-            const SizedBox(height: 8),
+            AppSpacing.inlineGap.hBox,
             TagChipInput(
               tags: _tags,
               onChanged: (tags) => setState(() => _tags = tags),
             ),
-            const SizedBox(height: 24),
+            AppSpacing.sectionGap.hBox,
 
             // 4. Quick Expiry
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              padding: EdgeInsets.symmetric(horizontal: AppSpacing.cardPadding, vertical: AppSpacing.md),
               decoration: BoxDecoration(
                 color: cs.surfaceContainerLow,
                 borderRadius: BorderRadius.circular(18),
@@ -330,13 +336,13 @@ class _AddItemScreenState extends State<AddItemScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 24),
+            AppSpacing.sectionGap.hBox,
 
             // 5. Attachments
             _SectionLabel('Attachments'),
-            const SizedBox(height: 8),
+            AppSpacing.inlineGap.hBox,
             _buildAttachmentsList(cs),
-            const SizedBox(height: 12),
+            AppSpacing.md.hBox,
             Row(
               children: [
                 _AttachmentAction(
@@ -345,14 +351,14 @@ class _AddItemScreenState extends State<AddItemScreen> {
                   onTap: _takePhoto,
                   cs: cs,
                 ),
-                const SizedBox(width: 8),
+                AppSpacing.inlineGap.w,
                 _AttachmentAction(
                   icon: Icons.photo_library_rounded,
                   label: 'Photo',
                   onTap: _pickPhoto,
                   cs: cs,
                 ),
-                const SizedBox(width: 8),
+                AppSpacing.inlineGap.w,
                 _AttachmentAction(
                   icon: Icons.picture_as_pdf_rounded,
                   label: 'PDF',
@@ -361,11 +367,11 @@ class _AddItemScreenState extends State<AddItemScreen> {
                 ),
               ],
             ),
-            const SizedBox(height: 24),
+            AppSpacing.sectionGap.hBox,
 
             // 6. Additional Fields
             _SectionLabel('Additional Fields'),
-            const SizedBox(height: 8),
+            AppSpacing.inlineGap.hBox,
             Row(
               children: [
                 _AttachmentAction(
@@ -376,7 +382,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            AppSpacing.md.hBox,
             if (_slots.isEmpty)
               Text(
                 'Add custom fields like passwords, IDs, or dates.',
@@ -427,11 +433,11 @@ class _AddItemScreenState extends State<AddItemScreen> {
                   );
                 },
               ),
-            const SizedBox(height: 24),
+            AppSpacing.sectionGap.hBox,
 
             // 7. Notes
             _SectionLabel('Notes'),
-            const SizedBox(height: 8),
+            AppSpacing.inlineGap.hBox,
             TextField(
               controller: _notesCtrl,
               maxLines: null,
@@ -459,7 +465,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
         fillColor: cs.surfaceContainerLow,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(color: cs.outlineVariant),
+          borderSide: BorderSide.none,
         ),
       ),
     );
@@ -472,7 +478,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: _attachmentPaths.length,
-        separatorBuilder: (_, _) => const SizedBox(width: 8),
+        separatorBuilder: (_, _) => AppSpacing.inlineGap.w,
         itemBuilder: (context, index) {
           final path = _attachmentPaths[index];
           final isPdf = path.toLowerCase().endsWith('.pdf');

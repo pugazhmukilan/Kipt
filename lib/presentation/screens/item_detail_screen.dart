@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:path/path.dart' as p;
 import '../../core/constants/app_constants.dart';
+import '../../core/spacing.dart';
 import '../../core/utils/camera_aspect_ratio.dart';
 import '../../data/models/attachment.dart';
 import '../../data/models/item_field.dart';
@@ -93,8 +94,9 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
     if (list != null && _awaitingReload) return true;
     if (list != null) _awaitingReload = true;
 
-    if (!_isCurrentRoute())
+    if (!_isCurrentRoute()) {
       return true; // stay on spinner until we regain focus
+    }
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
@@ -304,11 +306,20 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
               state.item.item.id == widget.itemId) {
             final item = state.item;
             return SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(20, 10, 20, 100),
+              padding: EdgeInsets.fromLTRB(
+                AppSpacing.pageMargin,
+                AppSpacing.pageMargin,
+                AppSpacing.pageMargin,
+                AppSpacing.massive + AppSpacing.fabMargin,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // 1. Header
+                  // 1. Header: category pill → title → tags
+                  if (item.categoryName != null) ...[
+                    _CategoryPill(name: item.categoryName!),
+                    AppSpacing.xl.hBox,
+                  ],
                   Text(
                     item.item.title,
                     style: const TextStyle(
@@ -318,22 +329,11 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                       height: 1.2,
                     ),
                   ),
-                  if (item.categoryName != null) ...[
-                    const SizedBox(height: 6),
-                    Text(
-                      item.categoryName!,
-                      style: TextStyle(
-                        fontSize: 15,
-                        color: cs.primary,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
                   if (item.item.tags.isNotEmpty) ...[
-                    const SizedBox(height: 12),
+                    AppSpacing.md.hBox,
                     Wrap(
-                      spacing: 6,
-                      runSpacing: 4,
+                      spacing: AppSpacing.xs,
+                      runSpacing: AppSpacing.xs,
                       children: item.item.tags
                           .map(
                             (t) => Chip(
@@ -346,8 +346,8 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                               ),
                               backgroundColor: cs.surfaceContainerHigh,
                               side: BorderSide.none,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 4,
+                              padding: EdgeInsets.symmetric(
+                                horizontal: AppSpacing.xs,
                               ),
                               materialTapTargetSize:
                                   MaterialTapTargetSize.shrinkWrap,
@@ -356,7 +356,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                           .toList(),
                     ),
                   ],
-                  const SizedBox(height: 24),
+                  AppSpacing.sectionGap.hBox,
 
                   // 1b. Photo carousel (swipe left/right through images)
                   if (item.attachments.any((a) => a.isPhoto)) ...[
@@ -367,45 +367,45 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                       onPageChanged: (index) =>
                           setState(() => _currentPhotoIndex = index),
                     ),
-                    const SizedBox(height: 24),
+                    AppSpacing.sectionGap.hBox,
                   ],
 
                   // 2. Nearest-expiry highlight
                   if (item.nearestDateField != null) ...[
                     _NearestExpiryHighlight(field: item.nearestDateField!),
-                    const SizedBox(height: 24),
+                    AppSpacing.sectionGap.hBox,
                   ],
 
                   // 3. Fields list
                   if (item.fields.isNotEmpty) ...[
                     _SectionLabel('Fields'),
-                    const SizedBox(height: 12),
+                    AppSpacing.md.hBox,
                     _buildFieldsList(item.fields),
-                    const SizedBox(height: 24),
+                    AppSpacing.sectionGap.hBox,
                   ],
 
                   // 4. Attachments (photos are shown in the carousel above — this grid
                   //     shows the non-photo documents, e.g. PDFs)
                   if (item.attachments.any((a) => !a.isPhoto)) ...[
                     _SectionLabel('Documents'),
-                    const SizedBox(height: 12),
+                    AppSpacing.md.hBox,
                     AttachmentGrid(
                       attachments: item.attachments
                           .where((a) => !a.isPhoto)
                           .toList(),
                       showDelete: false, // Delete happens via edit mode
                     ),
-                    const SizedBox(height: 24),
+                    AppSpacing.sectionGap.hBox,
                   ],
 
                   // 5. Notes
                   if (item.item.notes != null &&
                       item.item.notes!.isNotEmpty) ...[
                     _SectionLabel('Notes'),
-                    const SizedBox(height: 12),
+                    AppSpacing.md.hBox,
                     Container(
                       width: double.infinity,
-                      padding: const EdgeInsets.all(16),
+                      padding: EdgeInsets.all(AppSpacing.cardPadding),
                       decoration: BoxDecoration(
                         color: cs.surfaceContainerLow,
                         borderRadius: BorderRadius.circular(18),
@@ -443,7 +443,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
   Widget _buildFieldsList(List<ItemField> fields) {
     if (fields.length <= AppConstants.fieldsCollapseThreshold ||
         !_fieldsCollapsed) {
-      return Column(children: _buildFieldWidgets(fields));
+      return _wrapFieldsCard(_buildFieldCells(fields));
     }
 
     // Collapsed state
@@ -452,21 +452,19 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
         _isLoginPair(fields[visibleCount - 1], fields[visibleCount])) {
       visibleCount++;
     }
-    final visible = fields.take(visibleCount).toList();
     final hiddenCount = fields.length - visibleCount;
+    final visibleCells = _buildFieldCells(fields.take(visibleCount).toList());
 
-    return Column(
-      children: [
-        ..._buildFieldWidgets(visible),
-        TextButton(
-          onPressed: () => setState(() => _fieldsCollapsed = false),
-          child: Text('Show all $hiddenCount more fields'),
-        ),
-      ],
+    return _wrapFieldsCard(
+      visibleCells,
+      trailing: TextButton(
+        onPressed: () => setState(() => _fieldsCollapsed = false),
+        child: Text('Show all $hiddenCount more fields'),
+      ),
     );
   }
 
-  List<Widget> _buildFieldWidgets(List<ItemField> fields) {
+  List<Widget> _buildFieldCells(List<ItemField> fields) {
     final widgets = <Widget>[];
     for (var index = 0; index < fields.length; index++) {
       final field = fields[index];
@@ -484,11 +482,20 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
             username: field,
             password: next!,
             onRevealPassword: () => _revealPassword(next),
+            bordered: false,
           ),
         );
         index++;
       } else {
-        widgets.add(_buildFieldRow(field));
+        widgets.add(
+          FieldRowWidget(
+            field: field,
+            includeContainer: false,
+            onRevealRequested: field.fieldType == FieldType.password
+                ? () async => _revealPassword(field)
+                : null,
+          ),
+        );
       }
     }
     return widgets;
@@ -508,16 +515,38 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
     return repo.readPasswordField(field.id!);
   }
 
-  Widget _buildFieldRow(ItemField field) {
-    return FieldRowWidget(
-      field: field,
-      onRevealRequested: field.fieldType == FieldType.password
-          ? () async {
-              // Spec §7: every reveal of a PASSWORD value requires a fresh
-              // biometric/PIN check, not just a session-level unlock.
-              return _revealPassword(field);
-            }
-          : null,
+  /// Wraps field cells in one bordered card, separated by hairline dividers.
+  Widget _wrapFieldsCard(List<Widget> cells, {Widget? trailing}) {
+    final cs = Theme.of(context).colorScheme;
+    final children = <Widget>[];
+    for (var i = 0; i < cells.length; i++) {
+      if (i > 0) children.add(Divider(height: 1, color: cs.outlineVariant));
+      children.add(
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: AppSpacing.cardPadding, vertical: AppSpacing.md),
+          child: cells[i],
+        ),
+      );
+    }
+    if (trailing != null) {
+      children.add(Divider(height: 1, color: cs.outlineVariant));
+      children.add(
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(AppSpacing.sm, 0, AppSpacing.sm, AppSpacing.xs),
+            child: trailing,
+          ),
+        ),
+      );
+    }
+    return Container(
+      decoration: BoxDecoration(
+        color: cs.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: cs.outlineVariant),
+      ),
+      child: Column(children: children),
     );
   }
 }
@@ -555,7 +584,7 @@ class _NearestExpiryHighlight extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      padding: EdgeInsets.symmetric(horizontal: AppSpacing.cardPadding, vertical: AppSpacing.cardPadding),
       decoration: BoxDecoration(
         color: bgColor,
         borderRadius: BorderRadius.circular(18),
@@ -571,7 +600,7 @@ class _NearestExpiryHighlight extends StatelessWidget {
             ),
             child: Icon(icon, size: 24, color: iconColor),
           ),
-          const SizedBox(width: 14),
+          AppSpacing.md.w,
           Expanded(
             child: Text(
               text,
@@ -608,9 +637,39 @@ class _SectionLabel extends StatelessWidget {
   }
 }
 
-/// Swipeable photo carousel shown at the top of the details page. Each photo
-/// occupies one full slide; swiping left/right moves between pictures. If the
-/// underlying image file is missing a graceful placeholder is shown instead.
+/// Breadcrumb-style pill shown above an item title in the details header.
+class _CategoryPill extends StatelessWidget {
+  final String name;
+  const _CategoryPill({required this.name});
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xs),
+      decoration: BoxDecoration(
+        color: cs.primaryContainer,
+        borderRadius: BorderRadius.circular(100),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.folder_rounded, size: 15, color: cs.primary),
+          AppSpacing.xs.w,
+          Text(
+            name,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: cs.onPrimaryContainer,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _PhotoCarousel extends StatelessWidget {
   final List<Attachment> photos;
   final PageController controller;
@@ -685,14 +744,14 @@ class _PhotoCarousel extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(height: 10),
+        AppSpacing.md.hBox,
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: List.generate(photos.length, (i) {
             final isActive = i == initialIndex;
             return AnimatedContainer(
               duration: const Duration(milliseconds: 200),
-              margin: const EdgeInsets.symmetric(horizontal: 3),
+              margin: EdgeInsets.symmetric(horizontal: AppSpacing.xs),
               width: isActive ? 18 : 7,
               height: 7,
               decoration: BoxDecoration(
@@ -733,7 +792,7 @@ class _ItemGoneView extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
     return Center(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 32),
+        padding: EdgeInsets.symmetric(horizontal: AppSpacing.xxxl),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -742,7 +801,7 @@ class _ItemGoneView extends StatelessWidget {
               size: 56,
               color: cs.onSurfaceVariant.withValues(alpha: 0.6),
             ),
-            const SizedBox(height: 16),
+            AppSpacing.lg.hBox,
             Text(
               'Item not found',
               style: TextStyle(
@@ -751,13 +810,13 @@ class _ItemGoneView extends StatelessWidget {
                 color: cs.onSurface,
               ),
             ),
-            const SizedBox(height: 8),
+            AppSpacing.inlineGap.hBox,
             Text(
               'This item may have been deleted.',
               style: TextStyle(color: cs.onSurfaceVariant),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 20),
+            AppSpacing.xl.hBox,
             FilledButton.icon(
               onPressed: () => Navigator.of(context).pop(),
               icon: const Icon(Icons.arrow_back_rounded),

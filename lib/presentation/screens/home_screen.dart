@@ -108,11 +108,10 @@ class _HomeScreenState extends State<HomeScreen>
         onSettingsNavigationEnd: () {
           setState(() {
             _isSettingsActive = false;
-            _wasInBackground = false; // Reset to prevent auth trigger
+            _wasInBackground = false;
           });
         },
       ),
-      // FAB is now inside ItemsListScreen to better integrate with scrolling
     );
   }
 }

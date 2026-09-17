@@ -22,77 +22,77 @@ class AppTheme {
   static const Color lightSurfaceContainerHigh = Color(0xFFE4EFEE);
 
   // Dark palette.
-  static const Color darkSurface = Color(0xFF101414);
-  static const Color darkSurfaceCard = Color(0xFF161B1B);
-  static const Color darkOnSurface = Color(0xFFE4ECEA);
-  static const Color darkOnSurfaceVariant = Color(0xFFA0ACAA);
-  static const Color darkOutline = Color(0xFF465452);
-  static const Color darkOutlineVariant = Color(0xFF33413F);
-  static const Color darkSurfaceContainerHigh = Color(0xFF242C2B);
+  static const Color darkSurface = Color(0xFF101416);
+  static const Color darkSurfaceCard = Color(0xFF181D1F);
+  static const Color darkOnSurface = Color(0xFFE9EEEF);
+  static const Color darkOnSurfaceVariant = Color(0xFFAAB5B7);
+  static const Color darkOutline = Color(0xFF566367);
+  static const Color darkOutlineVariant = Color(0xFF394347);
+  static const Color darkSurfaceContainerHigh = Color(0xFF293135);
 
   static ColorScheme get lightColorScheme => const ColorScheme.light(
-        primary: brandTeal,
-        onPrimary: Colors.white,
-        primaryContainer: Color(0xFFD2EFEC),
-        onPrimaryContainer: Color(0xFF0C5450),
-        secondary: Color(0xFF4F7A76),
-        onSecondary: Colors.white,
-        secondaryContainer: Color(0xFFD6EAE7),
-        onSecondaryContainer: Color(0xFF0E4B47),
-        tertiary: Color(0xFFB67D1E),
-        onTertiary: Colors.white,
-        tertiaryContainer: Color(0xFFFAF0DC),
-        onTertiaryContainer: Color(0xFF5F4506),
-        error: Color(0xFFD04A41),
-        onError: Colors.white,
-        errorContainer: Color(0xFFFAE1DE),
-        onErrorContainer: Color(0xFF772D26),
-        surface: lightSurface,
-        surfaceContainerLowest: Color(0xFFFFFFFF),
-        surfaceContainerLow: lightSurfaceCard,
-        surfaceContainer: Color(0xFFEDF4F3),
-        surfaceContainerHigh: lightSurfaceContainerHigh,
-        surfaceContainerHighest: Color(0xFFD9E7E5),
-        onSurface: lightOnSurface,
-        onSurfaceVariant: lightOnSurfaceVariant,
-        outline: lightOutline,
-        outlineVariant: lightOutlineVariant,
-        inverseSurface: lightOnSurface,
-        onInverseSurface: Color(0xFFF2F7F6),
-        shadow: Color(0xFF24424A),
-      );
+    primary: brandTeal,
+    onPrimary: Colors.white,
+    primaryContainer: Color(0xFFD2EFEC),
+    onPrimaryContainer: Color(0xFF0C5450),
+    secondary: Color(0xFF4F7A76),
+    onSecondary: Colors.white,
+    secondaryContainer: Color(0xFFD6EAE7),
+    onSecondaryContainer: Color(0xFF0E4B47),
+    tertiary: Color(0xFFB67D1E),
+    onTertiary: Colors.white,
+    tertiaryContainer: Color(0xFFFAF0DC),
+    onTertiaryContainer: Color(0xFF5F4506),
+    error: Color(0xFFD04A41),
+    onError: Colors.white,
+    errorContainer: Color(0xFFFAE1DE),
+    onErrorContainer: Color(0xFF772D26),
+    surface: lightSurface,
+    surfaceContainerLowest: Color(0xFFFFFFFF),
+    surfaceContainerLow: lightSurfaceCard,
+    surfaceContainer: Color(0xFFEDF4F3),
+    surfaceContainerHigh: lightSurfaceContainerHigh,
+    surfaceContainerHighest: Color(0xFFD9E7E5),
+    onSurface: lightOnSurface,
+    onSurfaceVariant: lightOnSurfaceVariant,
+    outline: lightOutline,
+    outlineVariant: lightOutlineVariant,
+    inverseSurface: lightOnSurface,
+    onInverseSurface: Color(0xFFF2F7F6),
+    shadow: Color(0xFF24424A),
+  );
 
   static ColorScheme get darkColorScheme => const ColorScheme.dark(
-        primary: Color(0xFF61C9C1),
-        onPrimary: Color(0xFF063B37),
-        primaryContainer: Color(0xFF1B5C56),
-        onPrimaryContainer: Color(0xFFBCE9E4),
-        secondary: Color(0xFF8DBDB8),
-        onSecondary: Color(0xFF143B38),
-        secondaryContainer: Color(0xFF285450),
-        onSecondaryContainer: Color(0xFFC3E7E3),
-        tertiary: Color(0xFFE3A649),
-        onTertiary: Color(0xFF4B3400),
-        tertiaryContainer: Color(0xFF63430A),
-        onTertiaryContainer: Color(0xFFFFE3B6),
-        error: Color(0xFFF08077),
-        onError: Color(0xFF4A1210),
-        errorContainer: Color(0xFF5E2723),
-        onErrorContainer: Color(0xFFFFDAD6),
-        surface: darkSurface,
-        surfaceContainerLowest: Color(0xFF0C1010),
-        surfaceContainerLow: darkSurfaceCard,
-        surfaceContainer: Color(0xFF1B2221),
-        surfaceContainerHigh: darkSurfaceContainerHigh,
-        surfaceContainerHighest: Color(0xFF2D3736),
-        onSurface: darkOnSurface,
-        onSurfaceVariant: darkOnSurfaceVariant,
-        outline: darkOutline,
-        outlineVariant: darkOutlineVariant,
-        inverseSurface: darkOnSurface,
-        onInverseSurface: Color(0xFF161B1B),
-        shadow: Color(0xFF000000),
-      );
+    primary: Color(0xFF68CEC3),
+    onPrimary: Color(0xFF073A36),
+    primaryContainer: Color(0xFF1C514C),
+    onPrimaryContainer: Color(0xFFB9ECE5),
+    secondary: Color(0xFFA5B8B6),
+    onSecondary: Color(0xFF263332),
+    secondaryContainer: Color(0xFF3A4847),
+    onSecondaryContainer: Color(0xFFD5E5E2),
+    tertiary: Color(0xFFE5B866),
+    onTertiary: Color(0xFF3D2E0D),
+    tertiaryContainer: Color(0xFF59461F),
+    onTertiaryContainer: Color(0xFFFFE1A8),
+    error: Color(0xFFFFB4AB),
+    onError: Color(0xFF541A16),
+    errorContainer: Color(0xFF642D29),
+    onErrorContainer: Color(0xFFFFDAD5),
+    surface: darkSurface,
+    surfaceContainerLowest: Color(0xFF0A0D0E),
+    surfaceContainerLow: darkSurfaceCard,
+    surfaceContainer: Color(0xFF202629),
+    surfaceContainerHigh: darkSurfaceContainerHigh,
+    surfaceContainerHighest: Color(0xFF343D41),
+    onSurface: darkOnSurface,
+    onSurfaceVariant: darkOnSurfaceVariant,
+    outline: darkOutline,
+    outlineVariant: darkOutlineVariant,
+    inverseSurface: darkOnSurface,
+    onInverseSurface: Color(0xFF161B1D),
+    shadow: Color(0xFF000000),
+  );
 
   static ThemeData get lightTheme => _buildTheme(lightColorScheme);
 
@@ -154,8 +154,16 @@ class AppTheme {
         letterSpacing: 0.2,
         color: colorScheme.onSurfaceVariant,
       ),
-      bodyLarge: TextStyle(fontSize: 16, height: 1.4, color: colorScheme.onSurface),
-      bodyMedium: TextStyle(fontSize: 14, height: 1.4, color: colorScheme.onSurface),
+      bodyLarge: TextStyle(
+        fontSize: 16,
+        height: 1.4,
+        color: colorScheme.onSurface,
+      ),
+      bodyMedium: TextStyle(
+        fontSize: 14,
+        height: 1.4,
+        color: colorScheme.onSurface,
+      ),
       labelLarge: TextStyle(
         fontSize: 14,
         fontWeight: FontWeight.w600,
@@ -163,9 +171,9 @@ class AppTheme {
       ),
     );
 
-    BorderRadius cardRadius = BorderRadius.circular(20);
-    BorderRadius fieldRadius = BorderRadius.circular(14);
-    BorderRadius pillRadius = BorderRadius.circular(100);
+    BorderRadius cardRadius = BorderRadius.circular(16);
+    BorderRadius fieldRadius = BorderRadius.circular(12);
+    BorderRadius buttonRadius = BorderRadius.circular(12);
 
     return ThemeData(
       useMaterial3: true,
@@ -196,12 +204,9 @@ class AppTheme {
         elevation: 0,
         color: colorScheme.surfaceContainerLow,
         surfaceTintColor: Colors.transparent,
-        shape: RoundedRectangleBorder(
-          borderRadius: cardRadius,
-          side: BorderSide(color: colorScheme.outlineVariant),
-        ),
-        clipBehavior: Clip.antiAlias,
+        shape: RoundedRectangleBorder(borderRadius: cardRadius),
         margin: EdgeInsets.zero,
+        clipBehavior: Clip.antiAlias,
       ),
       dividerTheme: DividerThemeData(
         color: colorScheme.outlineVariant,
@@ -232,7 +237,10 @@ class AppTheme {
           borderRadius: fieldRadius,
           borderSide: BorderSide(color: colorScheme.error, width: 2),
         ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 18,
+          vertical: 16,
+        ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
@@ -241,7 +249,7 @@ class AppTheme {
           elevation: 0,
           minimumSize: const Size(0, 48),
           padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
-          shape: RoundedRectangleBorder(borderRadius: pillRadius),
+          shape: RoundedRectangleBorder(borderRadius: buttonRadius),
           textStyle: const TextStyle(
             fontFamily: 'Inter',
             fontSize: 15,
@@ -256,7 +264,7 @@ class AppTheme {
           foregroundColor: colorScheme.onPrimary,
           minimumSize: const Size(0, 48),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-          shape: RoundedRectangleBorder(borderRadius: pillRadius),
+          shape: RoundedRectangleBorder(borderRadius: buttonRadius),
           textStyle: const TextStyle(
             fontFamily: 'Inter',
             fontSize: 15,
@@ -303,12 +311,15 @@ class AppTheme {
         backgroundColor: colorScheme.primary,
         foregroundColor: colorScheme.onPrimary,
         elevation: 2,
-        shape: RoundedRectangleBorder(borderRadius: pillRadius),
+        shape: RoundedRectangleBorder(borderRadius: buttonRadius),
       ),
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
         backgroundColor: colorScheme.inverseSurface,
-        contentTextStyle: TextStyle(color: colorScheme.onInverseSurface, fontSize: 14),
+        contentTextStyle: TextStyle(
+          color: colorScheme.onInverseSurface,
+          fontSize: 14,
+        ),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         elevation: 3,
       ),
@@ -316,8 +327,14 @@ class AppTheme {
         backgroundColor: colorScheme.surfaceContainer,
         selectedColor: colorScheme.primary,
         disabledColor: colorScheme.surfaceContainerHighest,
-        labelStyle: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 13),
-        secondaryLabelStyle: TextStyle(color: colorScheme.onPrimary, fontSize: 13),
+        labelStyle: TextStyle(
+          color: colorScheme.onSurfaceVariant,
+          fontSize: 13,
+        ),
+        secondaryLabelStyle: TextStyle(
+          color: colorScheme.onPrimary,
+          fontSize: 13,
+        ),
         side: BorderSide.none,
         shape: const StadiumBorder(),
       ),
@@ -329,7 +346,9 @@ class AppTheme {
       ),
       switchTheme: SwitchThemeData(
         thumbColor: WidgetStateProperty.resolveWith((states) {
-          if (states.contains(WidgetState.selected)) return colorScheme.onPrimary;
+          if (states.contains(WidgetState.selected)) {
+            return colorScheme.onPrimary;
+          }
           return colorScheme.surface;
         }),
         trackColor: WidgetStateProperty.resolveWith((states) {
@@ -350,7 +369,10 @@ class AppTheme {
           fontSize: 15,
           fontWeight: FontWeight.w500,
         ),
-        subtitleTextStyle: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 13),
+        subtitleTextStyle: TextStyle(
+          color: colorScheme.onSurfaceVariant,
+          fontSize: 13,
+        ),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
       tooltipTheme: TooltipThemeData(

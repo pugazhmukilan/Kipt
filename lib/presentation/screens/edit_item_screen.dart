@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
+import '../../core/spacing.dart';
 import '../../core/utils/image_picker_helper.dart';
 import '../../data/models/attachment.dart';
 import '../../data/models/category.dart';
@@ -305,7 +306,7 @@ class _EditItemScreenState extends State<EditItemScreen> {
             onPressed: _isLoading ? null : _onSave,
             child: const Text('Save'),
           ),
-          const SizedBox(width: 8),
+          AppSpacing.inlineGap.w,
         ],
       ),
       body: _buildBody(cs),
@@ -322,7 +323,7 @@ class _EditItemScreenState extends State<EditItemScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(_loadError!, style: TextStyle(color: cs.error)),
-            const SizedBox(height: 12),
+            AppSpacing.md.hBox,
             TextButton(onPressed: _loadItem, child: const Text('Retry')),
           ],
         ),
@@ -331,7 +332,12 @@ class _EditItemScreenState extends State<EditItemScreen> {
 
     return SingleChildScrollView(
       controller: _scrollController,
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
+      padding: EdgeInsets.fromLTRB(
+        AppSpacing.pageMargin,
+        AppSpacing.pageMargin,
+        AppSpacing.pageMargin,
+        AppSpacing.massive,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -350,26 +356,26 @@ class _EditItemScreenState extends State<EditItemScreen> {
               contentPadding: EdgeInsets.zero,
             ),
           ),
-          const SizedBox(height: 24),
+          AppSpacing.sectionGap.hBox,
 
           // 2. Category
           _SectionLabel('Category'),
-          const SizedBox(height: 8),
+          AppSpacing.inlineGap.hBox,
           _buildCategorySelector(cs),
-          const SizedBox(height: 24),
+          AppSpacing.sectionGap.hBox,
 
           // 3. Tags
           _SectionLabel('Tags'),
-          const SizedBox(height: 8),
+          AppSpacing.inlineGap.hBox,
           TagChipInput(
             tags: _tags,
             onChanged: (tags) => setState(() => _tags = tags),
           ),
-          const SizedBox(height: 24),
+          AppSpacing.sectionGap.hBox,
 
           // 4. Attachments (existing + new)
           _SectionLabel('Attachments'),
-          const SizedBox(height: 8),
+          AppSpacing.inlineGap.hBox,
           if (_attachments.isNotEmpty) ...[
             AttachmentGrid(
               attachments: _attachments,
@@ -379,11 +385,11 @@ class _EditItemScreenState extends State<EditItemScreen> {
                 if (idx >= 0) _removeAttachment(idx);
               },
             ),
-            const SizedBox(height: 12),
+            AppSpacing.md.hBox,
           ],
           if (_newAttachmentPaths.isNotEmpty) ...[
             _buildNewAttachmentsList(cs),
-            const SizedBox(height: 12),
+            AppSpacing.md.hBox,
           ],
           Row(
             children: [
@@ -393,14 +399,14 @@ class _EditItemScreenState extends State<EditItemScreen> {
                 onTap: _takePhoto,
                 cs: cs,
               ),
-              const SizedBox(width: 8),
+              AppSpacing.inlineGap.w,
               _AttachmentAction(
                 icon: Icons.photo_library_rounded,
                 label: 'Photo',
                 onTap: _pickPhoto,
                 cs: cs,
               ),
-              const SizedBox(width: 8),
+              AppSpacing.inlineGap.w,
               _AttachmentAction(
                 icon: Icons.picture_as_pdf_rounded,
                 label: 'PDF',
@@ -409,11 +415,11 @@ class _EditItemScreenState extends State<EditItemScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 24),
+          AppSpacing.sectionGap.hBox,
 
           // 5. Fields (pre-filled, reorderable)
           _SectionLabel('Fields'),
-          const SizedBox(height: 8),
+          AppSpacing.inlineGap.hBox,
           Row(
             children: [
               _AttachmentAction(
@@ -424,7 +430,7 @@ class _EditItemScreenState extends State<EditItemScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          AppSpacing.md.hBox,
           if (_slots.isEmpty)
             Text(
               'Add custom fields like passwords, IDs, or dates.',
@@ -475,11 +481,11 @@ class _EditItemScreenState extends State<EditItemScreen> {
                 );
               },
             ),
-          const SizedBox(height: 24),
+          AppSpacing.sectionGap.hBox,
 
           // 6. Notes
           _SectionLabel('Notes'),
-          const SizedBox(height: 8),
+          AppSpacing.inlineGap.hBox,
           TextField(
             controller: _notesCtrl,
             maxLines: null,
@@ -516,7 +522,7 @@ class _EditItemScreenState extends State<EditItemScreen> {
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: _newAttachmentPaths.length,
-        separatorBuilder: (_, _) => const SizedBox(width: 8),
+        separatorBuilder: (_, _) => AppSpacing.inlineGap.w,
         itemBuilder: (context, index) {
           final path = _newAttachmentPaths[index];
           final isPdf = path.toLowerCase().endsWith('.pdf');

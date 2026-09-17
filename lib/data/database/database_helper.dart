@@ -357,8 +357,9 @@ class DatabaseHelper {
   Future<int> insertCategory(Category category) async {
     final db = await database;
     final existing = await getCategoryByName(category.name);
-    if (existing != null)
+    if (existing != null) {
       throw Exception('A category with this name already exists');
+    }
     return db.insert(
       AppConstants.tableCategories,
       category.toMap()..remove('id'),
