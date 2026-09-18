@@ -10,7 +10,7 @@ class AboutScreen extends StatelessWidget {
     
     return Scaffold(
       appBar: AppBar(
-        title: const Text('About Kipt'),
+        title: const Text('About'),
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
@@ -22,7 +22,9 @@ class AboutScreen extends StatelessWidget {
                 ClipRRect(
                   borderRadius: BorderRadius.circular(20),
                   child: Image.asset(
-                    'assets/logo.png',
+                    Theme.of(context).brightness == Brightness.dark
+                        ? 'assets/Kpit_for_darktheme.png'
+                        : 'assets/Kpit_for_lighttheme.png',
                     width: 88,
                     height: 88,
                     fit: BoxFit.cover,
@@ -35,15 +37,7 @@ class AboutScreen extends StatelessWidget {
                     },
                   ),
                 ),
-                const SizedBox(height: 16),
-                Text(
-                  'Kipt',
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.w600,
-                    color: colorScheme.onSurface,
-                  ),
-                ),
+                const SizedBox(height: 24),
                 const SizedBox(height: 8),
                 Text(
                   'Version ${AppConstants.appVersion}',
@@ -58,12 +52,12 @@ class AboutScreen extends StatelessWidget {
           
           const SizedBox(height: 32),
           
-          // What is Kipt
+          // What is the app
           _buildSection(
             context,
             icon: Icons.lightbulb_outline,
-            title: 'What is Kipt?',
-            content: 'Kipt is your item vault. One card for every important thing you own — warranty, receipt, ID, or note — stored securely and offline on your device.',
+            title: 'What is this app?',
+            content: 'This is your item vault. One card for every important thing you own — warranty, receipt, ID, or note — stored securely and offline on your device.',
           ),
           
           const SizedBox(height: 24),
@@ -137,7 +131,7 @@ class AboutScreen extends StatelessWidget {
             children: [
               _buildStepItem(context, '1', 'Add an Item', 'Tap the + button on the home screen. Enter the item name and details or scan a receipt to auto-fill information.'),
               _buildStepItem(context, '2', 'Attach Documents', 'Add photos and PDFs of your receipt, warranty card, or ID. Multiple attachments supported.'),
-              _buildStepItem(context, '3', 'Set Category & Expiry', 'Choose a category and set the warranty expiry date. Kipt will automatically calculate and track it.'),
+              _buildStepItem(context, '3', 'Set Category & Expiry', 'Choose a category and set the warranty expiry date. The app will automatically calculate and track it.'),
               _buildStepItem(context, '4', 'Get Reminders', 'Enable notifications in Settings to receive alerts before warranties expire.'),
               _buildStepItem(context, '5', 'Search & Filter', 'Use the search bar or category filters on the home screen to quickly find any item.'),
               _buildStepItem(context, '6', 'View Details', 'Tap any item card to view complete details, edit information, or add notes.'),
@@ -209,7 +203,7 @@ class AboutScreen extends StatelessWidget {
             context,
             icon: Icons.privacy_tip_outlined,
             title: 'Privacy & Security',
-            content: 'Your privacy is our priority. Kipt is completely offline - your data never leaves your device. All information is stored locally on your phone. Backups are encrypted ZIP files that you control. No tracking, no analytics, no cloud storage. Your data is yours alone.',
+            content: 'Your privacy is our priority. This app is completely offline - your data never leaves your device. All information is stored locally on your phone. Backups are encrypted ZIP files that you control. No tracking, no analytics, no cloud storage. Your data is yours alone.',
           ),
           
           const SizedBox(height: 32),
@@ -217,7 +211,7 @@ class AboutScreen extends StatelessWidget {
           // Footer
           Center(
             child: Text(
-              '© 2025 Kipt — your item vault',
+              '© 2025 — your item vault',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 12,

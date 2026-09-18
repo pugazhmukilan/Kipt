@@ -78,7 +78,7 @@ class NotificationService {
 
     await _plugin.zonedSchedule(
       notifId,
-      'Kipt Reminder — $itemTitle',
+      'Item Reminder — $itemTitle',
       body,
       scheduledDate,
       const NotificationDetails(

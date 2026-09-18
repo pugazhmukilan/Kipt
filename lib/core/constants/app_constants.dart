@@ -1,6 +1,6 @@
 class AppConstants {
   // App Information
-  static const String appName = 'Kipt';
+  static const String appName = 'Item Vault';
   static const String appVersion = '2.0.0';
 
   // Database
@@ -38,7 +38,7 @@ class AppConstants {
   // Notification Settings
   static const int defaultReminderLeadDays = 30;
   static const String notificationChannelId = 'kipt_reminders';
-  static const String notificationChannelName = 'Kipt Reminders';
+  static const String notificationChannelName = 'Item Reminders';
   static const String notificationChannelDescription =
       'Notifications for item expiry and date reminders';
 

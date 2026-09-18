@@ -15,7 +15,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
   final List<OnboardingPage> _pages = [
     OnboardingPage(
-      imagePath: 'assets/logo.png',
+      useLogo: true,
       title: 'Keep Every Item',
       description: 'One card for every important thing you own — warranty, receipt, ID, or note.',
     ),
@@ -176,9 +176,13 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               borderRadius: BorderRadius.circular(20),
             ),
             clipBehavior: Clip.antiAlias,
-            child: page.imagePath != null
+            child: page.useLogo || page.imagePath != null
                 ? Image.asset(
-                    page.imagePath!,
+                page.useLogo
+                  ? (colorScheme.brightness == Brightness.dark
+                    ? 'assets/Kpit_for_darktheme.png'
+                    : 'assets/Kpit_for_lighttheme.png')
+                  : page.imagePath!,
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) => Icon(
                       page.icon,
@@ -243,12 +247,14 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 class OnboardingPage {
   final IconData icon;
   final String? imagePath;
+  final bool useLogo;
   final String title;
   final String description;
 
   OnboardingPage({
     IconData? icon,
     this.imagePath,
+    this.useLogo = false,
     required this.title,
     required this.description,
   }) : icon = icon ?? Icons.inventory_2_outlined;

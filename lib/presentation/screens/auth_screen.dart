@@ -58,7 +58,9 @@ class _AuthScreenState extends State<AuthScreen> {
             ClipRRect(
               borderRadius: BorderRadius.circular(20),
               child: Image.asset(
-                'assets/logo.png',
+                colorScheme.brightness == Brightness.dark
+                    ? 'assets/Kpit_for_darktheme.png'
+                    : 'assets/Kpit_for_lighttheme.png',
                 width: 80,
                 height: 80,
                 fit: BoxFit.cover,
@@ -71,7 +73,7 @@ class _AuthScreenState extends State<AuthScreen> {
             ),
             const SizedBox(height: 32),
             Text(
-              'Kipt',
+              'Item Vault',
               style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: colorScheme.onSurface,

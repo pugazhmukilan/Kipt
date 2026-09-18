@@ -94,7 +94,9 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
         opacity: _fadeAnimation,
         child: Center(
           child: Image.asset(
-            'assets/logo.png',
+            colorScheme.brightness == Brightness.dark
+                ? 'assets/Kpit_for_darktheme.png'
+                : 'assets/Kpit_for_lighttheme.png',
             width: 120,
             height: 120,
             errorBuilder: (context, error, stackTrace) {

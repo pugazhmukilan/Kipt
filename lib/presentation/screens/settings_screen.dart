@@ -58,7 +58,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           if (state is BackupExportSuccess) {
             Share.shareXFiles(
               [XFile(state.backupFilePath, mimeType: 'application/octet-stream')],
-              subject: 'Kipt Backup',
+              subject: 'Item Vault Backup',
             );
             
             ScaffoldMessenger.of(context).showSnackBar(
@@ -257,7 +257,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       _SettingTile(
                         icon: Icons.description_outlined,
                         iconColor: cs.secondary,
-                        title: 'About Kipt',
+                        title: 'About',
                         subtitle: 'Design, usage tips and privacy',
                         onTap: () {
                           Navigator.of(context).push(

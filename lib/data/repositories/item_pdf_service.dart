@@ -508,14 +508,6 @@ class ItemPdfService {
                   ),
                   pw.SizedBox(width: 8),
                 ],
-                pw.Text(
-                  AppConstants.appName,
-                  style: pw.TextStyle(
-                    color: _ink,
-                    fontWeight: pw.FontWeight.bold,
-                    fontSize: 12,
-                  ),
-                ),
               ],
             ),
             pw.Flexible(
@@ -545,8 +537,7 @@ class ItemPdfService {
         mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
         children: [
           pw.Text(
-            'Exported from ${AppConstants.appName}'
-            ' · ${_formatDate(DateTime.now())}',
+            'Exported · ${_formatDate(DateTime.now())}',
             style: _captionStyle,
           ),
           pw.Text(
@@ -630,7 +621,7 @@ class ItemPdfService {
   static Future<pw.MemoryImage?> _loadLogo() async {
     if (_cachedLogo != null) return _cachedLogo!;
     try {
-      final data = await rootBundle.load('assets/logo.png');
+      final data = await rootBundle.load('assets/Kpit_for_lighttheme.png');
       final bytes = data.buffer.asUint8List();
       const pngMagic = [0x89, 0x50, 0x4E, 0x47];
       final isPng = bytes.length >= 8 &&

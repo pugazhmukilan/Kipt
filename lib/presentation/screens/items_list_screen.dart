@@ -273,25 +273,14 @@ class _ItemsListScreenState extends State<ItemsListScreen> {
       title: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: Image.asset(
-              'assets/logo.png',
-              width: 30,
-              height: 30,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) =>
-                  Icon(Icons.inventory_2_rounded, size: 30, color: cs.primary),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Text(
-            'Kipt',
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.w700,
-              color: cs.onSurface,
-            ),
+          Image.asset(
+            cs.brightness == Brightness.dark
+                ? 'assets/Kpit_for_darktheme.png'
+                : 'assets/Kpit_for_lighttheme.png',
+            height: 30,
+            fit: BoxFit.contain,
+            errorBuilder: (context, error, stackTrace) =>
+                Icon(Icons.inventory_2_rounded, size: 30, color: cs.primary),
           ),
         ],
       ),

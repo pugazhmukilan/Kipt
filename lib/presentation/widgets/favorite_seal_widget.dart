@@ -11,30 +11,18 @@ class FavoriteSeal extends StatelessWidget {
   Widget build(BuildContext context) {
     return Transform.rotate(
       angle: -0.12,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.15),
-              blurRadius: 5,
-              offset: const Offset(1, 2),
-            ),
-          ],
-        ),
-        child: ClipOval(
-          child: SizedBox(
-            width: size,
-            height: size,
-            child: Image.asset(
-              'assets/logo.png',
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) => Icon(
-                Icons.star_rounded,
-                size: size * 0.7,
-                color: Theme.of(context).colorScheme.tertiary,
-              ),
-            ),
+      child: SizedBox(
+        width: size,
+        height: size,
+        child: Image.asset(
+          Theme.of(context).brightness == Brightness.dark
+              ? 'assets/Kpit_for_darktheme.png'
+              : 'assets/Kpit_for_lighttheme.png',
+          fit: BoxFit.contain,
+          errorBuilder: (context, error, stackTrace) => Icon(
+            Icons.star_rounded,
+            size: size * 0.7,
+            color: Theme.of(context).colorScheme.tertiary,
           ),
         ),
       ),

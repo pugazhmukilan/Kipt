@@ -109,7 +109,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     return _buildEmptyState(
                       cs,
                       icon: Icons.search_rounded,
-                      title: 'Search Kipt',
+                      title: 'Search Items',
                       subtitle: 'Find items by title, tags, or fields',
                     );
                   }

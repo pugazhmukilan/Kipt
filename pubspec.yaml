@@ -66,9 +66,8 @@ flutter:
   uses-material-design: true
   
   assets:
-    - assets/logo.png
-    - assets/light_logo.png
-    - assets/darklogo.png
+    - assets/Kpit_for_darktheme.png
+    - assets/Kpit_for_lighttheme.png
 
   fonts:
     - family: Inter

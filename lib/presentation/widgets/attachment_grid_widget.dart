@@ -176,7 +176,7 @@ class FullScreenImageViewer extends StatelessWidget {
   Future<void> _share(BuildContext context) async {
     await Share.shareXFiles(
       [XFile(path)],
-      subject: 'Kipt photo',
+      subject: 'Item photo',
     );
   }
 
