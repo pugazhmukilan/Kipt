@@ -687,60 +687,62 @@ class _PhotoCarousel extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     if (photos.isEmpty) return const SizedBox.shrink();
+    final activeIndex = initialIndex.clamp(0, photos.length - 1);
+    final activeRatio = photos[activeIndex].aspectRatio ?? 0.75;
 
     return Column(
       children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(20),
-          child: Container(
-            height: 280,
-            color: cs.surfaceContainerHigh,
-            child: PageView.builder(
-              controller: controller,
-              itemCount: photos.length,
-              onPageChanged: onPageChanged,
-              itemBuilder: (context, index) {
-                final photo = photos[index];
-                final path = photo.path;
-                final file = File(path);
-                return LayoutBuilder(
-                  builder: (context, constraints) {
-                    final size = fitAspectRatioBox(
-                      // Newer photos carry their frame ratio; older ones fall
-                      // back to a classic 3:4 frame.
-                      ratio: photo.aspectRatio ?? 0.75,
-                      maxWidth: constraints.maxWidth,
-                      maxHeight: constraints.maxHeight,
-                    );
-                    return Center(
-                      child: SizedBox(
-                        width: size.width,
-                        height: size.height,
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
-                          child: GestureDetector(
-                            onTap: () => Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (_) =>
-                                    FullScreenImageViewer(path: path),
+        AspectRatio(
+          aspectRatio: activeRatio > 0 ? activeRatio : 0.75,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: Container(
+              color: cs.surfaceContainerHigh,
+              child: PageView.builder(
+                controller: controller,
+                itemCount: photos.length,
+                onPageChanged: onPageChanged,
+                itemBuilder: (context, index) {
+                  final photo = photos[index];
+                  final path = photo.path;
+                  final file = File(path);
+                  return LayoutBuilder(
+                    builder: (context, constraints) {
+                      final size = fitAspectRatioBox(
+                        ratio: photo.aspectRatio ?? 0.75,
+                        maxWidth: constraints.maxWidth,
+                        maxHeight: constraints.maxHeight,
+                      );
+                      return Center(
+                        child: SizedBox(
+                          width: size.width,
+                          height: size.height,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: GestureDetector(
+                              onTap: () => Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) =>
+                                      FullScreenImageViewer(path: path),
+                                ),
                               ),
+                              child: file.existsSync()
+                                  ? Image.file(
+                                      file,
+                                      fit: BoxFit.contain,
+                                      errorBuilder:
+                                          (context, error, stackTrace) =>
+                                              _PhotoPlaceholder(cs: cs),
+                                    )
+                                  : _PhotoPlaceholder(cs: cs),
                             ),
-                            child: file.existsSync()
-                                ? Image.file(
-                                    file,
-                                    fit: BoxFit.contain,
-                                    errorBuilder:
-                                        (context, error, stackTrace) =>
-                                            _PhotoPlaceholder(cs: cs),
-                                  )
-                                : _PhotoPlaceholder(cs: cs),
                           ),
                         ),
-                      ),
-                    );
-                  },
-                );
-              },
+                      );
+                    },
+                  );
+                },
+              ),
             ),
           ),
         ),

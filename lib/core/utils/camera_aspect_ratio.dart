@@ -10,7 +10,6 @@ enum CameraAspectRatio {
   square(label: '1:1', value: 1.0),
   portrait3x4(label: '3:4', value: 3 / 4),
   a4(label: 'A4', value: 210 / 297),
-  portrait9x16(label: '9:16', value: 9 / 16),
   landscape16x9(label: '16:9', value: 16 / 9);
 
   final String label;
@@ -128,48 +127,32 @@ class PhotoRatioUtils {
       final decoded = img.decodeImage(bytes);
       if (decoded == null) return inputPath;
 
-      // Frame size in preview-box units; fractions along each box axis.
-      final frame = fitAspectRatioBox(
-        ratio: targetRatio,
-        maxWidth: previewWidth,
-        maxHeight: previewHeight,
-      );
-      final fx = frame.width / previewWidth;
-      final fy = frame.height / previewHeight;
-
-      // The preview box is the sensor image rotated so it stands upright. Its
-      // short axis (width on screen) maps to the raw image's short side and
-      // its long axis to the raw image's long side.
-      final landscapeRaw = decoded.width >= decoded.height;
-      double keepX;
-      double keepY;
-      if (landscapeRaw) {
-        keepX = decoded.width * fy;
-        keepY = decoded.height * fx;
-      } else {
-        keepX = decoded.width * fx;
-        keepY = decoded.height * fy;
-      }
-      final cropW = keepX.round().clamp(1, decoded.width);
-      final cropH = keepY.round().clamp(1, decoded.height);
-      final x = ((decoded.width - cropW) / 2).round().clamp(
-            0,
-            decoded.width - cropW,
-          );
-      final y = ((decoded.height - cropH) / 2).round().clamp(
-            0,
-            decoded.height - cropH,
-          );
-      var image = img.copyCrop(
-        decoded,
-        x: x,
-        y: y,
-        width: cropW,
-        height: cropH,
-      );
-      if (landscapeRaw) {
-        // Rotate the sensor-oriented crop so it stores upright like the frame.
+      // Camera files may keep the sensor orientation in EXIF metadata. Apply
+      // that orientation before mapping the frame to pixels.
+      var image = img.bakeOrientation(decoded);
+      if (previewHeight > previewWidth && image.width > image.height) {
         image = img.copyRotate(image, angle: 90);
+      }
+
+      if (targetRatio > 0) {
+        final currentRatio = image.width / image.height;
+        if ((currentRatio - targetRatio).abs() > 0.02) {
+          final cropW = currentRatio > targetRatio
+              ? (image.height * targetRatio).round()
+              : image.width;
+          final cropH = currentRatio > targetRatio
+              ? image.height
+              : (image.width / targetRatio).round();
+          final x = ((image.width - cropW) / 2).round();
+          final y = ((image.height - cropH) / 2).round();
+          image = img.copyCrop(
+            image,
+            x: x,
+            y: y,
+            width: cropW,
+            height: cropH,
+          );
+        }
       }
 
       // Scale down oversize results.
