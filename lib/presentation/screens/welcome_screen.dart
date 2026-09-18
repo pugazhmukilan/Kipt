@@ -168,34 +168,35 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           // Icon or logo
-          Container(
-            width: 80,
-            height: 80,
-            decoration: BoxDecoration(
-              color: colorScheme.primaryContainer.withValues(alpha: 0.3),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            clipBehavior: Clip.antiAlias,
-            child: page.useLogo || page.imagePath != null
-                ? Image.asset(
-                page.useLogo
+          if (page.useLogo || page.imagePath != null)
+            Image.asset(
+              page.useLogo
                   ? (colorScheme.brightness == Brightness.dark
-                    ? 'assets/Kpit_for_darktheme.png'
-                    : 'assets/Kpit_for_lighttheme.png')
+                      ? 'assets/Kpit_for_darktheme.png'
+                      : 'assets/Kpit_for_lighttheme.png')
                   : page.imagePath!,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => Icon(
-                      page.icon,
-                      size: 40,
-                      color: colorScheme.primary,
-                    ),
-                  )
-                : Icon(
-                    page.icon,
-                    size: 40,
-                    color: colorScheme.primary,
-                  ),
-          ),
+              height: 56,
+              fit: BoxFit.contain,
+              errorBuilder: (context, error, stackTrace) => Icon(
+                page.icon,
+                size: 40,
+                color: colorScheme.primary,
+              ),
+            )
+          else
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                color: colorScheme.primaryContainer.withValues(alpha: 0.3),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Icon(
+                page.icon,
+                size: 40,
+                color: colorScheme.primary,
+              ),
+            ),
           const SizedBox(height: 40),
           
           // Title

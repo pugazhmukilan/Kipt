@@ -38,6 +38,7 @@ class _HomeScreenState extends State<HomeScreen>
 
   @override
   void didPopNext() {
+    FocusManager.instance.primaryFocus?.unfocus();
     if (mounted) context.read<ItemBloc>().add(const LoadItems());
   }
 

@@ -45,6 +45,9 @@ class _ItemsListScreenState extends State<ItemsListScreen> {
   void initState() {
     super.initState();
     _loadCategories();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _searchFocusNode.unfocus();
+    });
   }
 
   @override
@@ -195,6 +198,7 @@ class _ItemsListScreenState extends State<ItemsListScreen> {
                   child: TextField(
                     controller: _searchController,
                     focusNode: _searchFocusNode,
+                    autofocus: false,
                     onChanged: _onSearchChanged,
                     textInputAction: TextInputAction.search,
                     decoration: InputDecoration(

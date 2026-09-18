@@ -55,20 +55,16 @@ class _AuthScreenState extends State<AuthScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(20),
-              child: Image.asset(
-                colorScheme.brightness == Brightness.dark
-                    ? 'assets/Kpit_for_darktheme.png'
-                    : 'assets/Kpit_for_lighttheme.png',
-                width: 80,
-                height: 80,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => Icon(
-                  Icons.lock_outline,
-                  size: 80,
-                  color: colorScheme.primary,
-                ),
+            Image.asset(
+              colorScheme.brightness == Brightness.dark
+                  ? 'assets/Kpit_for_darktheme.png'
+                  : 'assets/Kpit_for_lighttheme.png',
+              height: 48,
+              fit: BoxFit.contain,
+              errorBuilder: (context, error, stackTrace) => Icon(
+                Icons.lock_outline,
+                size: 48,
+                color: colorScheme.primary,
               ),
             ),
             const SizedBox(height: 32),

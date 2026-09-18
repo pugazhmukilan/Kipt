@@ -97,8 +97,8 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
             colorScheme.brightness == Brightness.dark
                 ? 'assets/Kpit_for_darktheme.png'
                 : 'assets/Kpit_for_lighttheme.png',
-            width: 120,
-            height: 120,
+            height: 56,
+            fit: BoxFit.contain,
             errorBuilder: (context, error, stackTrace) {
               return Icon(
                 Icons.inventory_2_outlined,

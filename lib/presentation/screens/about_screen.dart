@@ -19,23 +19,19 @@ class AboutScreen extends StatelessWidget {
           Center(
             child: Column(
               children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(20),
-                  child: Image.asset(
-                    Theme.of(context).brightness == Brightness.dark
-                        ? 'assets/Kpit_for_darktheme.png'
-                        : 'assets/Kpit_for_lighttheme.png',
-                    width: 88,
-                    height: 88,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Icon(
-                        Icons.inventory_2_outlined,
-                        size: 80,
-                        color: colorScheme.primary,
-                      );
-                    },
-                  ),
+                Image.asset(
+                  Theme.of(context).brightness == Brightness.dark
+                      ? 'assets/Kpit_for_darktheme.png'
+                      : 'assets/Kpit_for_lighttheme.png',
+                  height: 56,
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Icon(
+                      Icons.inventory_2_outlined,
+                      size: 56,
+                      color: colorScheme.primary,
+                    );
+                  },
                 ),
                 const SizedBox(height: 24),
                 const SizedBox(height: 8),
@@ -57,7 +53,7 @@ class AboutScreen extends StatelessWidget {
             context,
             icon: Icons.lightbulb_outline,
             title: 'What is this app?',
-            content: 'This is your item vault. One card for every important thing you own — warranty, receipt, ID, or note — stored securely and offline on your device.',
+            content: 'Store important items in one offline vault. Each item can include details, custom fields, expiry dates, notes, photos, and documents.',
           ),
           
           const SizedBox(height: 24),
@@ -72,50 +68,50 @@ class AboutScreen extends StatelessWidget {
               _buildFeatureItem(
                 context,
                 icon: Icons.camera_alt_outlined,
-                title: 'Smart Receipt Scanning',
-                description: 'Capture bills and receipts with your camera. OCR technology automatically extracts dates and key details.',
+                title: 'Capture Documents',
+                description: 'Take photos with the camera or choose files from your device. Store receipts, warranties, IDs, and PDFs with an item.',
               ),
               _buildFeatureItem(
                 context,
                 icon: Icons.notifications_outlined,
                 title: 'Expiry Reminders',
-                description: 'Get timely notifications before your items expire — warranties, IDs, subscriptions and more.',
+                description: 'Add expiry fields and enable reminders to receive notifications before warranties, subscriptions, leases, or other dates expire.',
               ),
               _buildFeatureItem(
                 context,
                 icon: Icons.backup_outlined,
                 title: 'Backup & Restore',
-                description: 'Safely export all your data as a ZIP file. Share or restore your warranties anytime. Your data is encrypted and secure.',
+                description: 'Export your local database and attachments as a backup file, then restore them from Settings when needed.',
               ),
               _buildFeatureItem(
                 context,
                 icon: Icons.category_outlined,
-                title: 'Smart Categories',
-                description: 'Organize items into categories: Electronics, Appliances, IDs, Documents, and more. Filter and search easily.',
+                title: 'Categories, Search & Filters',
+                description: 'Organize items by category. Search titles, tags, and non-sensitive field values, or filter the list by category.',
               ),
               _buildFeatureItem(
                 context,
                 icon: Icons.lock_outline,
-                title: 'Biometric Security',
-                description: 'Protect your data with fingerprint or PIN authentication. Your sensitive information stays private.',
+                title: 'Protected Fields',
+                description: 'Password fields are stored securely and require authentication before their values can be revealed.',
               ),
               _buildFeatureItem(
                 context,
                 icon: Icons.cloud_off_outlined,
                 title: '100% Offline',
-                description: 'Works completely offline. No internet required. Your data never leaves your device unless you explicitly export it.',
+                description: 'Your items, fields, attachments, and settings are stored locally. Nothing is uploaded unless you choose to share or export it.',
               ),
               _buildFeatureItem(
                 context,
                 icon: Icons.attach_file_outlined,
                 title: 'Multiple Attachments',
-                description: 'Store multiple photos and PDFs per item — receipts, warranty cards, IDs, and more.',
+                description: 'Add multiple photos and PDF documents to each item, preview photos, share files, and export item details as a PDF.',
               ),
               _buildFeatureItem(
                 context,
                 icon: Icons.home_work_outlined,
-                title: 'Rental Management',
-                description: 'Special mode for rental properties with tenant details, monthly rent tracking, deposit management, and lease dates.',
+                title: 'Flexible Item Records',
+                description: 'Use custom text, number, date, choice, and protected fields to track products, documents, rentals, subscriptions, or anything else.',
               ),
             ],
           ),
@@ -129,13 +125,12 @@ class AboutScreen extends StatelessWidget {
             title: 'How to Use',
             content: null,
             children: [
-              _buildStepItem(context, '1', 'Add an Item', 'Tap the + button on the home screen. Enter the item name and details or scan a receipt to auto-fill information.'),
-              _buildStepItem(context, '2', 'Attach Documents', 'Add photos and PDFs of your receipt, warranty card, or ID. Multiple attachments supported.'),
-              _buildStepItem(context, '3', 'Set Category & Expiry', 'Choose a category and set the warranty expiry date. The app will automatically calculate and track it.'),
-              _buildStepItem(context, '4', 'Get Reminders', 'Enable notifications in Settings to receive alerts before warranties expire.'),
-              _buildStepItem(context, '5', 'Search & Filter', 'Use the search bar or category filters on the home screen to quickly find any item.'),
-              _buildStepItem(context, '6', 'View Details', 'Tap any item card to view complete details, edit information, or add notes.'),
-              _buildStepItem(context, '7', 'Backup Regularly', 'Go to Settings > Backup & Restore > Create Backup to export all your data as a ZIP file.'),
+              _buildStepItem(context, '1', 'Create an Item', 'Tap +, enter a title, choose a category, and add the fields that describe the item.'),
+              _buildStepItem(context, '2', 'Add Evidence', 'Attach photos or PDFs of receipts, warranties, IDs, manuals, and other documents.'),
+              _buildStepItem(context, '3', 'Track Dates', 'Add date fields and enable reminders when you need expiry or renewal notifications.'),
+              _buildStepItem(context, '4', 'Find Items', 'Use the home search field for titles, tags, and field values, or select a category filter.'),
+              _buildStepItem(context, '5', 'Manage Details', 'Open an item to view attachments, reveal protected values after authentication, edit fields, or add notes.'),
+              _buildStepItem(context, '6', 'Export Safely', 'Create a backup from Settings, or generate and share a PDF report from an item.'),
             ],
           ),
           
@@ -149,14 +144,12 @@ class AboutScreen extends StatelessWidget {
             content: null,
             children: [
               _buildCategoryItem(context, 'All', 'View all items across all categories'),
-              _buildCategoryItem(context, 'Electronics', 'Phones, laptops, cameras, headphones, etc.'),
-              _buildCategoryItem(context, 'Appliances', 'Washing machines, refrigerators, air conditioners, etc.'),
-              _buildCategoryItem(context, 'Home Appliances', 'Kitchen appliances, vacuum cleaners, water purifiers, etc.'),
-              _buildCategoryItem(context, 'Furniture', 'Beds, sofas, tables, wardrobes, etc.'),
-              _buildCategoryItem(context, 'Vehicles', 'Cars, bikes, scooters and more'),
-              _buildCategoryItem(context, 'Tools', 'Power tools, hand tools, equipment'),
-              _buildCategoryItem(context, 'Rentals', 'Rental properties with tenant and lease management'),
-              _buildCategoryItem(context, 'Others', 'Any other items you want to track'),
+              _buildCategoryItem(context, 'Electronics', 'Phones, laptops, cameras, appliances, and accessories.'),
+              _buildCategoryItem(context, 'Documents', 'IDs, certificates, receipts, warranties, and important papers.'),
+              _buildCategoryItem(context, 'Home & Furniture', 'Furniture, household items, and home equipment.'),
+              _buildCategoryItem(context, 'Vehicles & Tools', 'Vehicles, tools, equipment, and maintenance records.'),
+              _buildCategoryItem(context, 'Rentals', 'Rental items, tenants, deposits, and lease dates.'),
+              _buildCategoryItem(context, 'Others', 'Anything else you want to organize and track.'),
             ],
           ),
           
