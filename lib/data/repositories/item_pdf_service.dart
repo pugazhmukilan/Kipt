@@ -109,16 +109,21 @@ class ItemPdfService {
     }
 
     for (final document in documents) {
-      doc.addPage(
-        pw.MultiPage(
-          pageFormat: PdfPageFormat.a4,
-          margin: pw.EdgeInsets.all(40),
-          header: (context) =>
-              _buildHeader(context, '${details.item.title} - Document'),
-          footer: _buildFooter,
-          build: (context) => _documentSection(document),
-        ),
-      );
+      for (var pageIndex = 0; pageIndex < document.pages.length; pageIndex++) {
+        final page = document.pages[pageIndex];
+        doc.addPage(
+          pw.Page(
+            pageFormat: PdfPageFormat.a4,
+            margin: pw.EdgeInsets.all(40),
+            build: (context) => _documentPage(
+              details.item.title,
+              document,
+              page,
+              pageIndex,
+            ),
+          ),
+        );
+      }
     }
 
     return doc.save();
@@ -128,11 +133,17 @@ class ItemPdfService {
   /// shared or opened by the system PDF viewer.
   Future<String> writeShareFile(Uint8List bytes, String title) async {
     final dir = await getTemporaryDirectory();
-    final safe = title.trim().replaceAll(RegExp(r'[^\w\s-]'), '').trim();
-    final name = '${safe.isEmpty ? 'item' : safe}.pdf';
+    final name = fileNameForTitle(title);
     final file = File(p.join(dir.path, name));
     await file.writeAsBytes(bytes, flush: true);
     return file.path;
+  }
+
+  /// Returns a filesystem-safe preview/share name without relying on storage.
+  String fileNameForTitle(String title) {
+    final safe = title.trim().replaceAll(RegExp(r'[^\w\s-]'), '').trim();
+    final shortened = safe.length > 80 ? safe.substring(0, 80).trim() : safe;
+    return '${shortened.isEmpty ? 'item' : shortened}.pdf';
   }
 
   // ---------------------------------------------------------------------------
@@ -429,26 +440,78 @@ class ItemPdfService {
     );
   }
 
-  List<pw.Widget> _documentSection(_RasterDoc document) {
-    return [
-      _sectionHeading('Attached Document'),
-      pw.SizedBox(height: 4),
-      pw.Text(document.fileName, style: _captionStyle),
-      pw.SizedBox(height: 14),
-      for (var i = 0; i < document.pages.length; i++) ...[
+  pw.Widget _documentPage(
+    String itemTitle,
+    _RasterDoc document,
+    _RasterDocPage page,
+    int pageIndex,
+  ) {
+    return pw.Column(
+      crossAxisAlignment: pw.CrossAxisAlignment.start,
+      children: [
+        _documentHeader('$itemTitle - Document'),
+        _sectionHeading('Attached Document'),
+        pw.SizedBox(height: 4),
+        pw.Text(document.fileName, style: _captionStyle),
+        pw.SizedBox(height: 8),
         pw.Text(
-          'Page ${i + 1} of ${document.pages.length}',
+          'Page ${pageIndex + 1} of ${document.pages.length}',
           style: _captionStyle,
         ),
-        pw.SizedBox(height: 4),
-        pw.Image(
-          pw.MemoryImage(document.pages[i].pngBytes),
-          fit: pw.BoxFit.contain,
-          width: double.infinity,
+        pw.SizedBox(height: 8),
+        pw.Expanded(
+          child: pw.Image(
+            pw.MemoryImage(page.pngBytes),
+            fit: pw.BoxFit.contain,
+            alignment: pw.Alignment.center,
+          ),
         ),
-        if (i != document.pages.length - 1) pw.SizedBox(height: 16),
+        _documentFooter(),
       ],
-    ];
+    );
+  }
+
+  pw.Widget _documentHeader(String pageTitle) {
+    final logo = _logo;
+    return pw.Column(
+      mainAxisSize: pw.MainAxisSize.min,
+      children: [
+        pw.Container(height: 3, color: _accent),
+        pw.SizedBox(height: 10),
+        pw.Row(
+          mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+          children: [
+            if (logo != null)
+              pw.SizedBox(
+                width: 18,
+                height: 18,
+                child: pw.Image(logo, fit: pw.BoxFit.contain),
+              ),
+            pw.Flexible(
+              child: pw.Text(
+                pageTitle,
+                textAlign: pw.TextAlign.right,
+                style: pw.TextStyle(color: _inkFaint, fontSize: 9),
+                maxLines: 1,
+              ),
+            ),
+          ],
+        ),
+        pw.SizedBox(height: 10),
+        pw.Container(height: 0.5, color: _border),
+        pw.SizedBox(height: 12),
+      ],
+    );
+  }
+
+  pw.Widget _documentFooter() {
+    return pw.Padding(
+      padding: pw.EdgeInsets.only(top: 8),
+      child: pw.Text(
+        'Exported · ${_formatDate(DateTime.now())}',
+        style: _captionStyle,
+      ),
+    );
   }
 
   pw.Widget _sectionHeading(String text) {

@@ -76,6 +76,17 @@ void main() {
     expectPdfMagic(bytes);
   });
 
+  test('creates a bounded safe filename for PDF previews', () {
+    final name = service.fileNameForTitle(
+      'A' * 120 + r' / warranty:receipt?*',
+    );
+
+    expect(name, endsWith('.pdf'));
+    expect(name.length, lessThanOrEqualTo(84));
+    expect(name, isNot(contains('/')));
+    expect(name, isNot(contains(':')));
+  });
+
   test(
       'fieldRows includes every field — passwords masked when no values given',
       () {

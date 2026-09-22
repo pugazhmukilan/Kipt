@@ -302,6 +302,10 @@ class FullScreenImageViewer extends StatelessWidget {
         child: InteractiveViewer(
           boundaryMargin: const EdgeInsets.all(160),
           clipBehavior: Clip.none,
+          minScale: 1.0,
+          maxScale: 5.0,
+          panEnabled: true,
+          scaleEnabled: true,
           child: Image.file(File(path)),
         ),
       ),

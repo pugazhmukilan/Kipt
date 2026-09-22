@@ -216,14 +216,21 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
         item,
         passwordValues: passwordValues,
       );
-      final filePath = await service.writeShareFile(bytes, item.item.title);
+      var fileName = service.fileNameForTitle(item.item.title);
+      try {
+        final filePath = await service.writeShareFile(bytes, item.item.title);
+        fileName = p.basename(filePath);
+      } catch (_) {
+        // The preview can still share the in-memory PDF if temporary storage
+        // is unavailable.
+      }
       if (!mounted) return;
       Navigator.of(context).pop(); // dismiss the loading dialog
       await navigator.push(
         MaterialPageRoute(
           builder: (_) => ItemPdfPreviewScreen(
             bytes: bytes,
-            fileName: p.basename(filePath),
+            fileName: fileName,
           ),
         ),
       );
