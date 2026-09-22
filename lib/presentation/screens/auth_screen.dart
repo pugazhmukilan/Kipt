@@ -20,7 +20,7 @@ class _AuthScreenState extends State<AuthScreen> {
 
   Future<void> _authenticate() async {
     if (_isAuthenticating) return;
-    
+
     setState(() {
       _isAuthenticating = true;
     });
@@ -34,7 +34,7 @@ class _AuthScreenState extends State<AuthScreen> {
         setState(() {
           _isAuthenticating = false;
         });
-        
+
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Authentication failed. Please try again.'),
@@ -48,7 +48,7 @@ class _AuthScreenState extends State<AuthScreen> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    
+
     return Scaffold(
       backgroundColor: colorScheme.surface,
       body: Center(
@@ -57,8 +57,8 @@ class _AuthScreenState extends State<AuthScreen> {
           children: [
             Image.asset(
               colorScheme.brightness == Brightness.dark
-                  ? 'assets/Kpit_for_darktheme.png'
-                  : 'assets/Kpit_for_lighttheme.png',
+                  ? 'assets/Kipt_for_darktheme.png'
+                  : 'assets/Kipt_for_lighttheme.png',
               height: 48,
               fit: BoxFit.contain,
               errorBuilder: (context, error, stackTrace) => Icon(
@@ -71,16 +71,16 @@ class _AuthScreenState extends State<AuthScreen> {
             Text(
               'Item Vault',
               style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: colorScheme.onSurface,
-                  ),
+                fontWeight: FontWeight.bold,
+                color: colorScheme.onSurface,
+              ),
             ),
             const SizedBox(height: 16),
             Text(
               'Authenticate to continue',
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: colorScheme.onSurface.withValues(alpha: 0.6),
-                  ),
+                color: colorScheme.onSurface.withValues(alpha: 0.6),
+              ),
             ),
             const SizedBox(height: 48),
             if (_isAuthenticating)
@@ -91,7 +91,10 @@ class _AuthScreenState extends State<AuthScreen> {
                 icon: const Icon(Icons.fingerprint),
                 label: const Text('Authenticate'),
                 style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 32,
+                    vertical: 16,
+                  ),
                 ),
               ),
           ],

@@ -171,7 +171,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
   }
 
   void _addField(ItemField field) {
-    _slots.add(FieldSlot.single(_nextSlotKey(), field));
+    setState(() => _slots.add(FieldSlot.single(_nextSlotKey(), field)));
   }
 
   void _scrollToBottom() {
@@ -268,9 +268,9 @@ class _AddItemScreenState extends State<AddItemScreen> {
             TextField(
               controller: _titleCtrl,
               autofocus: true,
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w700),
               decoration: const InputDecoration(
-                hintText: 'Item Title',
+                hintText: 'Add title',
                 border: InputBorder.none,
                 enabledBorder: InputBorder.none,
                 focusedBorder: InputBorder.none,
@@ -298,7 +298,10 @@ class _AddItemScreenState extends State<AddItemScreen> {
 
             // 4. Quick Expiry
             Container(
-              padding: EdgeInsets.symmetric(horizontal: AppSpacing.cardPadding, vertical: AppSpacing.md),
+              padding: EdgeInsets.symmetric(
+                horizontal: AppSpacing.cardPadding,
+                vertical: AppSpacing.md,
+              ),
               decoration: BoxDecoration(
                 color: cs.surfaceContainerLow,
                 borderRadius: BorderRadius.circular(18),

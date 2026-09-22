@@ -1,8 +1,12 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_gallery_saver_plus/image_gallery_saver_plus.dart';
+import 'package:open_file/open_file.dart';
 import 'package:share_plus/share_plus.dart';
 import '../../data/models/attachment.dart';
+import '../bloc/item/item_bloc.dart';
+import '../bloc/item/item_event.dart';
 
 /// Grid display of item attachments with share, delete, and tap-to-view actions.
 class AttachmentGrid extends StatelessWidget {
@@ -94,15 +98,26 @@ class _AttachmentTile extends StatelessWidget {
 
   void _viewAttachment(BuildContext context) {
     if (attachment.isPhoto) {
-      Navigator.of(context).push(MaterialPageRoute(
-        builder: (_) => FullScreenImageViewer(path: attachment.path),
-      ));
-    } else {
-      // Open PDF via open_file or similar
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Opening PDF…')),
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => FullScreenImageViewer(
+            path: attachment.path,
+            attachmentId: attachment.id,
+            itemId: attachment.itemId,
+          ),
+        ),
       );
+    } else {
+      _openPdf(context);
     }
+  }
+
+  Future<void> _openPdf(BuildContext context) async {
+    final result = await OpenFile.open(attachment.path);
+    if (!context.mounted || result.type == ResultType.done) return;
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(result.message)));
   }
 
   Future<void> _shareAttachment(BuildContext context) async {
@@ -137,9 +152,20 @@ class _PdfThumbnail extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.picture_as_pdf_rounded, color: cs.onErrorContainer, size: 32),
+          Icon(
+            Icons.picture_as_pdf_rounded,
+            color: cs.onErrorContainer,
+            size: 32,
+          ),
           const SizedBox(height: 4),
-          Text('PDF', style: TextStyle(fontSize: 11, color: cs.onErrorContainer, fontWeight: FontWeight.w600)),
+          Text(
+            'PDF',
+            style: TextStyle(
+              fontSize: 11,
+              color: cs.onErrorContainer,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
         ],
       ),
     );
@@ -151,7 +177,11 @@ class _TileAction extends StatelessWidget {
   final VoidCallback onTap;
   final ColorScheme cs;
 
-  const _TileAction({required this.icon, required this.onTap, required this.cs});
+  const _TileAction({
+    required this.icon,
+    required this.onTap,
+    required this.cs,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -171,29 +201,34 @@ class _TileAction extends StatelessWidget {
 
 class FullScreenImageViewer extends StatelessWidget {
   final String path;
-  const FullScreenImageViewer({super.key, required this.path});
+  final int? attachmentId;
+  final int? itemId;
+
+  const FullScreenImageViewer({
+    super.key,
+    required this.path,
+    this.attachmentId,
+    this.itemId,
+  });
 
   Future<void> _share(BuildContext context) async {
-    await Share.shareXFiles(
-      [XFile(path)],
-      subject: 'Item photo',
-    );
+    await Share.shareXFiles([XFile(path)], subject: 'Item photo');
   }
 
   Future<void> _download(BuildContext context) async {
     final messenger = ScaffoldMessenger.of(context);
     final file = File(path);
     final name = file.uri.pathSegments.last;
-    messenger.showSnackBar(
-      const SnackBar(content: Text('Saving photo…')),
-    );
+    messenger.showSnackBar(const SnackBar(content: Text('Saving photo…')));
     try {
       final result = await ImageGallerySaverPlus.saveFile(path, name: name);
       final isSuccess = result is Map && result['isSuccess'] == true;
       messenger.hideCurrentSnackBar();
       messenger.showSnackBar(
         SnackBar(
-          content: Text(isSuccess ? 'Photo saved to gallery' : 'Could not save photo'),
+          content: Text(
+            isSuccess ? 'Photo saved to gallery' : 'Could not save photo',
+          ),
         ),
       );
     } catch (_) {
@@ -203,6 +238,36 @@ class FullScreenImageViewer extends StatelessWidget {
         const SnackBar(content: Text('Could not save photo')),
       );
     }
+  }
+
+  Future<void> _delete(BuildContext context) async {
+    if (attachmentId == null || itemId == null) return;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Delete photo?'),
+        content: const Text('This photo will be removed from the item.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !context.mounted) return;
+    context.read<ItemBloc>().add(
+      DeleteAttachment(
+        attachmentId: attachmentId!,
+        path: path,
+        itemId: itemId!,
+      ),
+    );
+    if (context.mounted) Navigator.of(context).pop();
   }
 
   @override
@@ -224,11 +289,19 @@ class FullScreenImageViewer extends StatelessWidget {
             tooltip: 'Share',
             onPressed: () => _share(context),
           ),
+          if (attachmentId != null && itemId != null)
+            IconButton(
+              icon: const Icon(Icons.delete_outline_rounded),
+              tooltip: 'Delete photo',
+              onPressed: () => _delete(context),
+            ),
           const SizedBox(width: 8),
         ],
       ),
       body: Center(
         child: InteractiveViewer(
+          boundaryMargin: const EdgeInsets.all(160),
+          clipBehavior: Clip.none,
           child: Image.file(File(path)),
         ),
       ),

@@ -17,22 +17,26 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     OnboardingPage(
       useLogo: true,
       title: 'Keep Every Item',
-      description: 'One card for every important thing you own — warranty, receipt, ID, or note.',
+      description:
+          'One card for every important thing you own — warranty, receipt, ID, or note.',
     ),
     OnboardingPage(
       icon: Icons.camera_alt_outlined,
       title: 'Scan Documents',
-      description: 'Quickly capture bills and receipts. Automatically extract dates and key information.',
+      description:
+          'Quickly capture bills and receipts. Automatically extract dates and key information.',
     ),
     OnboardingPage(
       icon: Icons.notifications_outlined,
       title: 'Expiry Reminders',
-      description: 'Receive timely notifications before your items expire. Never miss a deadline again.',
+      description:
+          'Receive timely notifications before your items expire. Never miss a deadline again.',
     ),
     OnboardingPage(
       icon: Icons.security_outlined,
       title: 'Private & Secure',
-      description: 'Your data stays on your device — locked, offline, and safe.',
+      description:
+          'Your data stays on your device — locked, offline, and safe.',
     ),
   ];
 
@@ -60,9 +64,9 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   Future<void> _completeOnboarding() async {
     await PreferencesHelper.setOnboardingComplete(true);
     if (mounted) {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const HomeScreen()),
-      );
+      Navigator.of(
+        context,
+      ).pushReplacement(MaterialPageRoute(builder: (_) => const HomeScreen()));
     }
   }
 
@@ -91,19 +95,19 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   onPressed: _skip,
                   style: TextButton.styleFrom(
                     foregroundColor: colorScheme.onSurfaceVariant,
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
                   ),
                   child: const Text(
                     'Skip',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w500,
-                    ),
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
                   ),
                 ),
               ),
             ),
-            
+
             // Page view with slides
             Expanded(
               child: PageView.builder(
@@ -115,7 +119,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 },
               ),
             ),
-            
+
             // Page indicators
             Padding(
               padding: const EdgeInsets.only(bottom: 20),
@@ -123,11 +127,12 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: List.generate(
                   _pages.length,
-                  (index) => _buildIndicator(index == _currentPage, colorScheme),
+                  (index) =>
+                      _buildIndicator(index == _currentPage, colorScheme),
                 ),
               ),
             ),
-            
+
             // Next/Get Started button
             Padding(
               padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
@@ -145,7 +150,9 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     elevation: 0,
                   ),
                   child: Text(
-                    _currentPage == _pages.length - 1 ? 'Get Started' : 'Continue',
+                    _currentPage == _pages.length - 1
+                        ? 'Get Started'
+                        : 'Continue',
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
@@ -172,16 +179,13 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             Image.asset(
               page.useLogo
                   ? (colorScheme.brightness == Brightness.dark
-                      ? 'assets/Kpit_for_darktheme.png'
-                      : 'assets/Kpit_for_lighttheme.png')
+                        ? 'assets/Kipt_for_darktheme.png'
+                        : 'assets/Kipt_for_lighttheme.png')
                   : page.imagePath!,
               height: 56,
               fit: BoxFit.contain,
-              errorBuilder: (context, error, stackTrace) => Icon(
-                page.icon,
-                size: 40,
-                color: colorScheme.primary,
-              ),
+              errorBuilder: (context, error, stackTrace) =>
+                  Icon(page.icon, size: 40, color: colorScheme.primary),
             )
           else
             Container(
@@ -191,14 +195,10 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 color: colorScheme.primaryContainer.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(20),
               ),
-              child: Icon(
-                page.icon,
-                size: 40,
-                color: colorScheme.primary,
-              ),
+              child: Icon(page.icon, size: 40, color: colorScheme.primary),
             ),
           const SizedBox(height: 40),
-          
+
           // Title
           Text(
             page.title,
@@ -212,7 +212,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             ),
           ),
           const SizedBox(height: 16),
-          
+
           // Description
           Text(
             page.description,
@@ -236,8 +236,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       width: isActive ? 24 : 8,
       height: 8,
       decoration: BoxDecoration(
-        color: isActive 
-            ? colorScheme.primary 
+        color: isActive
+            ? colorScheme.primary
             : colorScheme.onSurface.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(4),
       ),

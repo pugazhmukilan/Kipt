@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
 import '../../core/spacing.dart';
+import '../../core/utils/preferences_helper.dart';
 import '../../core/utils/image_picker_helper.dart';
 import '../../data/models/attachment.dart';
 import '../../data/models/category.dart';
@@ -40,6 +41,9 @@ class _EditItemScreenState extends State<EditItemScreen> {
   int? _selectedCategoryId;
 
   List<String> _tags = [];
+
+  bool _quickExpiryEnabled = false;
+  ItemField? _quickExpiryField;
 
   // Existing + newly added fields as editable slots (single fields and login
   // pairs, preserving sort_order).
@@ -101,11 +105,22 @@ class _EditItemScreenState extends State<EditItemScreen> {
         _titleCtrl.text = details.item.title;
         _notesCtrl.text = details.item.notes ?? '';
         _attachments = List<Attachment>.from(details.attachments);
+        final expiryField = details.fields
+            .where(
+              (field) =>
+                  field.label == 'Expiry Date' &&
+                  field.fieldType == FieldType.date,
+            )
+            .firstOrNull;
+        _quickExpiryEnabled = expiryField != null;
+        _quickExpiryField = expiryField;
+
         // Pre-fill fields preserving sort order. PASSWORD values are never
         // loaded into the editor — an empty value means "keep the stored secret".
         // Consecutive Username + Password fields are grouped back into a single
         // login entity for editing.
         final passwordCleared = details.fields
+            .where((field) => field.id != expiryField?.id)
             .map(
               (f) =>
                   f.fieldType == FieldType.password ? f.copyWith(value: '') : f,
@@ -148,7 +163,11 @@ class _EditItemScreenState extends State<EditItemScreen> {
     context.read<ItemBloc>().add(
       UpdateItem(
         item: updated,
-        fields: _slots.expand((s) => s.fields).toList(),
+        fields: [
+          if (_quickExpiryEnabled && _quickExpiryField != null)
+            _quickExpiryField!,
+          ..._slots.expand((s) => s.fields),
+        ],
         deletedFieldIds: _deletedFieldIds,
         newAttachmentPaths: _newAttachmentPaths,
         deletedAttachmentIds: _deletedAttachmentIds,
@@ -213,6 +232,26 @@ class _EditItemScreenState extends State<EditItemScreen> {
 
   void _addField(ItemField field) {
     setState(() => _slots.add(FieldSlot.single(_nextSlotKey(), field)));
+  }
+
+  void _toggleQuickExpiry(bool enabled) {
+    setState(() {
+      _quickExpiryEnabled = enabled;
+      if (enabled && _quickExpiryField == null) {
+        _quickExpiryField = ItemField(
+          itemId: widget.itemId,
+          label: 'Expiry Date',
+          fieldType: FieldType.date,
+          value: '',
+          reminderEnabled: true,
+          reminderLeadDays: PreferencesHelper.getDefaultLeadDays(),
+        );
+      }
+      if (!enabled && _quickExpiryField?.id != null) {
+        _deletedFieldIds.add(_quickExpiryField!.id!);
+        _quickExpiryField = null;
+      }
+    });
   }
 
   void _scrollToBottom() {
@@ -370,6 +409,51 @@ class _EditItemScreenState extends State<EditItemScreen> {
           TagChipInput(
             tags: _tags,
             onChanged: (tags) => setState(() => _tags = tags),
+          ),
+          AppSpacing.sectionGap.hBox,
+
+          Container(
+            padding: EdgeInsets.symmetric(
+              horizontal: AppSpacing.cardPadding,
+              vertical: AppSpacing.md,
+            ),
+            decoration: BoxDecoration(
+              color: cs.surfaceContainerLow,
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: cs.outlineVariant),
+            ),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.event_busy_rounded, color: cs.primary),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        'Track an expiry date for this item?',
+                        style: TextStyle(fontSize: 15, color: cs.onSurface),
+                      ),
+                    ),
+                    Switch(
+                      value: _quickExpiryEnabled,
+                      onChanged: _toggleQuickExpiry,
+                    ),
+                  ],
+                ),
+                if (_quickExpiryEnabled && _quickExpiryField != null) ...[
+                  const Divider(height: 24),
+                  FieldEditorWidget(
+                    field: _quickExpiryField!,
+                    onChanged: (field) =>
+                        setState(() => _quickExpiryField = field),
+                    onDelete: () => _toggleQuickExpiry(false),
+                    showDragHandle: false,
+                    showLabelEditor: false,
+                    showTypeSelector: false,
+                  ),
+                ],
+              ],
+            ),
           ),
           AppSpacing.sectionGap.hBox,
 

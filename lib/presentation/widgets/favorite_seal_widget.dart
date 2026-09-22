@@ -16,8 +16,8 @@ class FavoriteSeal extends StatelessWidget {
         height: size,
         child: Image.asset(
           Theme.of(context).brightness == Brightness.dark
-              ? 'assets/Kpit_for_darktheme.png'
-              : 'assets/Kpit_for_lighttheme.png',
+              ? 'assets/Kipt_for_darktheme.png'
+              : 'assets/Kipt_for_lighttheme.png',
           fit: BoxFit.contain,
           errorBuilder: (context, error, stackTrace) => Icon(
             Icons.star_rounded,

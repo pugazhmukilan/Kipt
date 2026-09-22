@@ -13,14 +13,15 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
 
   @override
   void initState() {
     super.initState();
-    
+
     // Simple fade-in animation
     _animationController = AnimationController(
       vsync: this,
@@ -49,7 +50,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     final isOnboardingComplete = PreferencesHelper.isOnboardingComplete();
 
     Widget nextScreen;
-    
+
     if (needsAuth) {
       // Show auth screen first
       final authResult = await Navigator.of(context).push<bool>(
@@ -58,23 +59,27 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
           fullscreenDialog: true,
         ),
       );
-      
+
       if (authResult != true && mounted) {
         // Auth failed, stay on splash or exit
         return;
       }
-      
+
       // After successful auth, show home or welcome
-      nextScreen = isOnboardingComplete ? const HomeScreen() : const WelcomeScreen();
+      nextScreen = isOnboardingComplete
+          ? const HomeScreen()
+          : const WelcomeScreen();
     } else {
       // No auth needed, show home or welcome
-      nextScreen = isOnboardingComplete ? const HomeScreen() : const WelcomeScreen();
+      nextScreen = isOnboardingComplete
+          ? const HomeScreen()
+          : const WelcomeScreen();
     }
 
     if (mounted) {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => nextScreen),
-      );
+      Navigator.of(
+        context,
+      ).pushReplacement(MaterialPageRoute(builder: (context) => nextScreen));
     }
   }
 
@@ -95,8 +100,8 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
         child: Center(
           child: Image.asset(
             colorScheme.brightness == Brightness.dark
-                ? 'assets/Kpit_for_darktheme.png'
-                : 'assets/Kpit_for_lighttheme.png',
+                ? 'assets/Kipt_for_darktheme.png'
+                : 'assets/Kipt_for_lighttheme.png',
             height: 56,
             fit: BoxFit.contain,
             errorBuilder: (context, error, stackTrace) {

@@ -393,7 +393,17 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                       attachments: item.attachments
                           .where((a) => !a.isPhoto)
                           .toList(),
-                      showDelete: false, // Delete happens via edit mode
+                      showDelete: true,
+                      onDelete: (attachment) {
+                        if (attachment.id == null) return;
+                        context.read<ItemBloc>().add(
+                          DeleteAttachment(
+                            attachmentId: attachment.id!,
+                            path: attachment.path,
+                            itemId: attachment.itemId,
+                          ),
+                        );
+                      },
                     ),
                     AppSpacing.sectionGap.hBox,
                   ],
@@ -523,7 +533,10 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
       if (i > 0) children.add(Divider(height: 1, color: cs.outlineVariant));
       children.add(
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: AppSpacing.cardPadding, vertical: AppSpacing.md),
+          padding: EdgeInsets.symmetric(
+            horizontal: AppSpacing.cardPadding,
+            vertical: AppSpacing.md,
+          ),
           child: cells[i],
         ),
       );
@@ -534,7 +547,12 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
         Align(
           alignment: Alignment.centerLeft,
           child: Padding(
-            padding: EdgeInsets.fromLTRB(AppSpacing.sm, 0, AppSpacing.sm, AppSpacing.xs),
+            padding: EdgeInsets.fromLTRB(
+              AppSpacing.sm,
+              0,
+              AppSpacing.sm,
+              AppSpacing.xs,
+            ),
             child: trailing,
           ),
         ),
@@ -584,7 +602,10 @@ class _NearestExpiryHighlight extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.symmetric(horizontal: AppSpacing.cardPadding, vertical: AppSpacing.cardPadding),
+      padding: EdgeInsets.symmetric(
+        horizontal: AppSpacing.cardPadding,
+        vertical: AppSpacing.cardPadding,
+      ),
       decoration: BoxDecoration(
         color: bgColor,
         borderRadius: BorderRadius.circular(18),
@@ -646,7 +667,10 @@ class _CategoryPill extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xs),
+      padding: EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: AppSpacing.xs,
+      ),
       decoration: BoxDecoration(
         color: cs.primaryContainer,
         borderRadius: BorderRadius.circular(100),
@@ -722,8 +746,11 @@ class _PhotoCarousel extends StatelessWidget {
                             child: GestureDetector(
                               onTap: () => Navigator.of(context).push(
                                 MaterialPageRoute(
-                                  builder: (_) =>
-                                      FullScreenImageViewer(path: path),
+                                  builder: (_) => FullScreenImageViewer(
+                                    path: path,
+                                    attachmentId: photo.id,
+                                    itemId: photo.itemId,
+                                  ),
                                 ),
                               ),
                               child: file.existsSync()

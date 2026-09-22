@@ -81,8 +81,7 @@ class ItemPdfService {
       ),
     );
 
-    final photoPageCount =
-        (photos.length / _photosPerPage).ceil();
+    final photoPageCount = (photos.length / _photosPerPage).ceil();
     for (var start = 0; start < photos.length; start += _photosPerPage) {
       final chunk = photos.sublist(
         start,
@@ -187,11 +186,7 @@ class ItemPdfService {
           ),
           child: pw.Text(
             details.item.notes!,
-            style: pw.TextStyle(
-              color: _inkMid,
-              fontSize: 10,
-              lineSpacing: 4,
-            ),
+            style: pw.TextStyle(color: _inkMid, fontSize: 10, lineSpacing: 4),
           ),
         ),
       ],
@@ -219,10 +214,7 @@ class ItemPdfService {
               ),
               child: pw.Text(
                 tag,
-                style: pw.TextStyle(
-                  fontSize: 8.5,
-                  color: _inkMid,
-                ),
+                style: pw.TextStyle(fontSize: 8.5, color: _inkMid),
               ),
             ),
           )
@@ -267,11 +259,7 @@ class ItemPdfService {
                 ? pw.BoxDecoration(color: _passwordBg)
                 : null,
             verticalAlignment: pw.TableCellVerticalAlignment.middle,
-            children: [
-              _typeBadge(row),
-              _fieldLabelCell(row),
-              _valueCell(row),
-            ],
+            children: [_typeBadge(row), _fieldLabelCell(row), _valueCell(row)],
           ),
       ],
     );
@@ -324,10 +312,7 @@ class ItemPdfService {
       padding: pw.EdgeInsets.symmetric(horizontal: 12, vertical: 9),
       child: pw.Text(
         row.fieldLabel,
-        style: pw.TextStyle(
-          color: _ink,
-          fontSize: 9.5,
-        ),
+        style: pw.TextStyle(color: _ink, fontSize: 9.5),
       ),
     );
   }
@@ -371,9 +356,12 @@ class ItemPdfService {
     return fields.map((field) {
       final value = switch (field.fieldType) {
         FieldType.text => field.value,
-        FieldType.date => field.parsedDate != null
-            ? DateFormat(AppConstants.dateFormatDisplay).format(field.parsedDate!)
-            : field.value,
+        FieldType.date =>
+          field.parsedDate != null
+              ? DateFormat(
+                  AppConstants.dateFormatDisplay,
+                ).format(field.parsedDate!)
+              : field.value,
         FieldType.password => _passwordDisplay(field, passwordValues),
       };
       return PdfFieldRow(
@@ -382,8 +370,8 @@ class ItemPdfService {
         fieldLabel: field.label,
         value: value,
         isPassword: field.fieldType == FieldType.password,
-        valueHidden: field.fieldType == FieldType.password &&
-            value == _maskedPassword,
+        valueHidden:
+            field.fieldType == FieldType.password && value == _maskedPassword,
       );
     }).toList();
   }
@@ -418,10 +406,7 @@ class ItemPdfService {
         ),
       );
     }
-    return pw.Column(
-      mainAxisSize: pw.MainAxisSize.min,
-      children: rows,
-    );
+    return pw.Column(mainAxisSize: pw.MainAxisSize.min, children: rows);
   }
 
   pw.Widget _photoCell(_PhotoData photo, int total) {
@@ -514,10 +499,7 @@ class ItemPdfService {
               child: pw.Text(
                 pageTitle,
                 textAlign: pw.TextAlign.right,
-                style: pw.TextStyle(
-                  color: _inkFaint,
-                  fontSize: 9,
-                ),
+                style: pw.TextStyle(color: _inkFaint, fontSize: 9),
                 maxLines: 1,
                 overflow: pw.TextOverflow.visible,
               ),
@@ -549,10 +531,7 @@ class ItemPdfService {
     );
   }
 
-  static const _captionStyle = pw.TextStyle(
-    fontSize: 8,
-    color: _inkFaint,
-  );
+  static const _captionStyle = pw.TextStyle(fontSize: 8, color: _inkFaint);
 
   // ---------------------------------------------------------------------------
   // Data loading
@@ -621,10 +600,11 @@ class ItemPdfService {
   static Future<pw.MemoryImage?> _loadLogo() async {
     if (_cachedLogo != null) return _cachedLogo!;
     try {
-      final data = await rootBundle.load('assets/Kpit_for_lighttheme.png');
+      final data = await rootBundle.load('assets/Kipt_for_lighttheme.png');
       final bytes = data.buffer.asUint8List();
       const pngMagic = [0x89, 0x50, 0x4E, 0x47];
-      final isPng = bytes.length >= 8 &&
+      final isPng =
+          bytes.length >= 8 &&
           pngMagic.asMap().entries.every((e) => bytes[e.key] == e.value);
       if (isPng) {
         _cachedLogo = pw.MemoryImage(bytes);
@@ -644,10 +624,7 @@ class _PhotoData {
   final Uint8List bytes;
   final int index;
 
-  const _PhotoData({
-    required this.bytes,
-    required this.index,
-  });
+  const _PhotoData({required this.bytes, required this.index});
 }
 
 class _RasterDoc {

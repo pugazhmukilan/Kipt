@@ -279,8 +279,8 @@ class _ItemsListScreenState extends State<ItemsListScreen> {
         children: [
           Image.asset(
             cs.brightness == Brightness.dark
-                ? 'assets/Kpit_for_darktheme.png'
-                : 'assets/Kpit_for_lighttheme.png',
+                ? 'assets/Kipt_for_darktheme.png'
+                : 'assets/Kipt_for_lighttheme.png',
             height: 30,
             fit: BoxFit.contain,
             errorBuilder: (context, error, stackTrace) =>

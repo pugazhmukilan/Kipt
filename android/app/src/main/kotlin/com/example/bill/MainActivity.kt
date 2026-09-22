@@ -1,4 +1,4 @@
-package com.example.bill
+package com.pugazh.kipt
 
 import io.flutter.embedding.android.FlutterFragmentActivity
 
