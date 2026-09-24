@@ -128,7 +128,7 @@ class _TextRow extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _FieldLabel(label: field.label),
-              const SizedBox(height: 4),
+              const SizedBox(height: 8),
               Text(
                 field.value.isEmpty ? '—' : field.value,
                 style: TextStyle(
@@ -186,7 +186,7 @@ class _DateRow extends StatelessWidget {
                   ],
                 ],
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 8),
               if (date != null) ...[
                 Text(
                   _formatDate(date),
@@ -264,7 +264,7 @@ class _PasswordRow extends StatelessWidget {
                   Icon(Icons.lock_rounded, size: 13, color: cs.primary),
                 ],
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 8),
               Text(
                 isRevealed && revealedValue != null
                     ? revealedValue!
@@ -323,7 +323,7 @@ class _FieldContainer extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       decoration: BoxDecoration(
         color: cs.surfaceContainerLow,
         borderRadius: BorderRadius.circular(18),
@@ -343,10 +343,10 @@ class _FieldLabel extends StatelessWidget {
     return Text(
       label,
       style: TextStyle(
-        fontSize: 12,
+        fontSize: 11,
         fontWeight: FontWeight.w600,
         color: Theme.of(context).colorScheme.onSurfaceVariant,
-        letterSpacing: 0.4,
+        letterSpacing: 0.7,
       ),
     );
   }

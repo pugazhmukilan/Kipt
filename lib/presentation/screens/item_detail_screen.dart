@@ -499,7 +499,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
             username: field,
             password: next!,
             onRevealPassword: () => _revealPassword(next),
-            bordered: false,
+            bordered: true,
           ),
         );
         index++;
@@ -507,7 +507,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
         widgets.add(
           FieldRowWidget(
             field: field,
-            includeContainer: false,
+            includeContainer: true,
             onRevealRequested: field.fieldType == FieldType.password
                 ? () async => _revealPassword(field)
                 : null,
@@ -532,24 +532,15 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
     return repo.readPasswordField(field.id!);
   }
 
-  /// Wraps field cells in one bordered card, separated by hairline dividers.
+  /// Keeps each field as a distinct block with a small visual gap between it
+  /// and the next field.
   Widget _wrapFieldsCard(List<Widget> cells, {Widget? trailing}) {
-    final cs = Theme.of(context).colorScheme;
     final children = <Widget>[];
     for (var i = 0; i < cells.length; i++) {
-      if (i > 0) children.add(Divider(height: 1, color: cs.outlineVariant));
-      children.add(
-        Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: AppSpacing.cardPadding,
-            vertical: AppSpacing.md,
-          ),
-          child: cells[i],
-        ),
-      );
+      if (i > 0) children.add(AppSpacing.sm.hBox);
+      children.add(cells[i]);
     }
     if (trailing != null) {
-      children.add(Divider(height: 1, color: cs.outlineVariant));
       children.add(
         Align(
           alignment: Alignment.centerLeft,
@@ -565,14 +556,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
         ),
       );
     }
-    return Container(
-      decoration: BoxDecoration(
-        color: cs.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: cs.outlineVariant),
-      ),
-      child: Column(children: children),
-    );
+    return Column(children: children);
   }
 }
 
