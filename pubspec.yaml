@@ -1,7 +1,7 @@
 name: warranty_vault
 description: "Kipt — An offline-first personal item vault with composable fields, secure password storage, and expiry tracking."
 publish_to: 'none'
-version: 2.0.0+1
+version: 2.0.4+6
 
 environment:
   sdk: ^3.10.1

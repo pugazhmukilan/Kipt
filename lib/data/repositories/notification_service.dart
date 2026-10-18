@@ -6,6 +6,7 @@ import '../models/item_field.dart';
 class NotificationService {
   static NotificationService? _instance;
   final FlutterLocalNotificationsPlugin _plugin;
+  Future<void>? _initialization;
 
   NotificationService._() : _plugin = FlutterLocalNotificationsPlugin();
 
@@ -15,6 +16,22 @@ class NotificationService {
   }
 
   Future<void> initialize() async {
+    final existingInitialization = _initialization;
+    if (existingInitialization != null) {
+      return existingInitialization;
+    }
+
+    final initialization = _initialize();
+    _initialization = initialization;
+    try {
+      await initialization;
+    } catch (_) {
+      _initialization = null;
+      rethrow;
+    }
+  }
+
+  Future<void> _initialize() async {
     const androidSettings =
         AndroidInitializationSettings('@mipmap/ic_launcher');
     const iosSettings = DarwinInitializationSettings(

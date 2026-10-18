@@ -1,6 +1,8 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:path/path.dart' as path;
 import 'package:share_plus/share_plus.dart';
 import '../bloc/backup/backup_bloc.dart';
 import '../bloc/backup/backup_event.dart';
@@ -16,7 +18,7 @@ import 'categories_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
-  
+
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
 }
@@ -25,13 +27,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _notificationsEnabled = true;
   int _defaultLeadDays = AppConstants.defaultReminderLeadDays;
   String _lastBackupDate = 'Never';
-  
+
   @override
   void initState() {
     super.initState();
     _loadPreferences();
   }
-  
+
   void _loadPreferences() {
     setState(() {
       _notificationsEnabled = PreferencesHelper.isNotificationEnabled();
@@ -45,36 +47,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
       }
     });
   }
-  
+
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Settings'),
-      ),
+      appBar: AppBar(title: const Text('Settings')),
       body: BlocListener<BackupBloc, BackupState>(
         listener: (context, state) {
           if (state is BackupExportSuccess) {
-            Share.shareXFiles(
-              [XFile(state.backupFilePath, mimeType: 'application/octet-stream')],
-              subject: 'Item Vault Backup',
-            );
-            
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Backup created successfully!')),
-            );
-            
-            _loadPreferences();
+            _saveBackupCopy(state.backupFilePath);
           }
-          
+
           if (state is BackupImportSuccess) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message)),
-            );
-            Navigator.of(context).pop(true); 
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(state.message)));
+            Navigator.of(context).pop(true);
           }
-          
+
           if (state is BackupError) {
             final colorScheme = Theme.of(context).colorScheme;
             ScaffoldMessenger.of(context).showSnackBar(
@@ -87,8 +78,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
         },
         child: BlocBuilder<BackupBloc, BackupState>(
           builder: (context, state) {
-            final isProcessing = state is BackupExporting || state is BackupImporting;
-            
+            final isProcessing =
+                state is BackupExporting || state is BackupImporting;
+
             if (isProcessing) {
               return LoadingIndicator(
                 message: state is BackupExporting
@@ -96,12 +88,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     : 'Importing backup...',
               );
             }
-            
+
             return ListView(
               children: [
                 _buildSectionHeader('Backup & Restore'),
                 Card(
-                  margin: EdgeInsets.symmetric(horizontal: AppSpacing.pageMargin, vertical: AppSpacing.xs),
+                  margin: EdgeInsets.symmetric(
+                    horizontal: AppSpacing.pageMargin,
+                    vertical: AppSpacing.xs,
+                  ),
                   child: Column(
                     children: [
                       _SettingTile(
@@ -122,10 +117,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ],
                   ),
                 ),
-                
+
                 _buildSectionHeader('Preferences'),
                 Card(
-                  margin: EdgeInsets.symmetric(horizontal: AppSpacing.pageMargin, vertical: AppSpacing.xs),
+                  margin: EdgeInsets.symmetric(
+                    horizontal: AppSpacing.pageMargin,
+                    vertical: AppSpacing.xs,
+                  ),
                   child: Column(
                     children: [
                       _SettingTile(
@@ -176,10 +174,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ],
                   ),
                 ),
-                
+
                 _buildSectionHeader('Security'),
                 Card(
-                  margin: EdgeInsets.symmetric(horizontal: AppSpacing.pageMargin, vertical: AppSpacing.xs),
+                  margin: EdgeInsets.symmetric(
+                    horizontal: AppSpacing.pageMargin,
+                    vertical: AppSpacing.xs,
+                  ),
                   child: FutureBuilder<bool>(
                     future: AuthService().isAuthenticationAvailable(),
                     builder: (context, snapshot) {
@@ -202,14 +203,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 if (value) {
                                   final authService = AuthService();
                                   try {
-                                    final authenticated = await authService.authenticate();
+                                    final authenticated = await authService
+                                        .authenticate();
                                     if (authenticated) {
                                       await AuthService.setAppLock(true);
                                       setState(() {});
                                       if (context.mounted) {
-                                        ScaffoldMessenger.of(context).showSnackBar(
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
                                           const SnackBar(
-                                            content: Text('App lock enabled successfully'),
+                                            content: Text(
+                                              'App lock enabled successfully',
+                                            ),
                                             backgroundColor: Colors.green,
                                           ),
                                         );
@@ -217,7 +223,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     }
                                   } catch (e) {
                                     if (context.mounted) {
-                                      ScaffoldMessenger.of(context).showSnackBar(
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
                                         SnackBar(
                                           content: Text('Error: $e'),
                                           backgroundColor: Colors.red,
@@ -230,7 +238,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   setState(() {});
                                   if (context.mounted) {
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text('App lock disabled')),
+                                      const SnackBar(
+                                        content: Text('App lock disabled'),
+                                      ),
                                     );
                                   }
                                 }
@@ -240,10 +250,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     },
                   ),
                 ),
-                
+
                 _buildSectionHeader('About'),
                 Card(
-                  margin: EdgeInsets.symmetric(horizontal: AppSpacing.pageMargin, vertical: AppSpacing.xs),
+                  margin: EdgeInsets.symmetric(
+                    horizontal: AppSpacing.pageMargin,
+                    vertical: AppSpacing.xs,
+                  ),
                   child: Column(
                     children: [
                       _SettingTile(
@@ -278,11 +291,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
     );
   }
-  
+
   Widget _buildSectionHeader(String title) {
     final colorScheme = Theme.of(context).colorScheme;
     return Padding(
-      padding: EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.xxxl, AppSpacing.xl, AppSpacing.md),
+      padding: EdgeInsets.fromLTRB(
+        AppSpacing.xl,
+        AppSpacing.xxxl,
+        AppSpacing.xl,
+        AppSpacing.md,
+      ),
       child: Text(
         title.toUpperCase(),
         style: TextStyle(
@@ -362,7 +380,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       },
     );
   }
-  
+
   void _exportBackup() {
     showDialog(
       context: context,
@@ -389,27 +407,67 @@ class _SettingsScreenState extends State<SettingsScreen> {
       },
     );
   }
-  
+
+  Future<void> _saveBackupCopy(String backupPath) async {
+    try {
+      final savedPath = await FilePicker.platform.saveFile(
+        dialogTitle: 'Save Item Vault backup',
+        fileName: path.basename(backupPath),
+        type: FileType.custom,
+        allowedExtensions: ['zip'],
+        bytes: await File(backupPath).readAsBytes(),
+      );
+
+      if (!mounted) return;
+
+      if (savedPath != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Backup saved to:\n$savedPath'),
+            duration: const Duration(seconds: 6),
+          ),
+        );
+      } else {
+        await Share.shareXFiles([
+          XFile(backupPath, mimeType: AppConstants.backupMimeType),
+        ], subject: 'Item Vault Backup');
+      }
+
+      _loadPreferences();
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Could not save backup: $e')));
+    }
+  }
+
   Future<void> _importBackup() async {
     try {
       final result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
-        allowedExtensions: ['zip', 'wvvault', 'json'],
+        allowedExtensions: ['zip'],
+        allowMultiple: false,
+        withData: true,
       );
-      
+
       if (result == null) return;
 
-      final selectedPath = result.files.single.path;
-      if (selectedPath == null) {
+      final selectedFile = result.files.single;
+      final selectedPath = selectedFile.path;
+      final selectedBytes = selectedFile.bytes;
+      if (selectedPath == null && selectedBytes == null) {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to import: file path unavailable')),
+          const SnackBar(
+            content: Text('Failed to import: file content unavailable'),
+          ),
         );
         return;
       }
-        
+
       if (!mounted) return;
-      
+
       showDialog(
         context: context,
         builder: (context) {
@@ -426,7 +484,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ElevatedButton(
                 onPressed: () {
                   Navigator.of(context).pop();
-                  context.read<BackupBloc>().add(ImportBackup(selectedPath));
+                  final backupEvent = selectedBytes != null
+                      ? ImportBackup.bytes(selectedBytes)
+                      : ImportBackup(selectedPath!);
+                  context.read<BackupBloc>().add(backupEvent);
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Theme.of(context).colorScheme.error,
@@ -443,13 +504,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
       );
     }
   }
-  
+
   void _changeDefaultLeadDays() {
     showDialog(
       context: context,
       builder: (context) {
         int selectedDays = _defaultLeadDays;
-        
+
         return AlertDialog(
           title: const Text('Default Reminder Lead Time'),
           content: StatefulBuilder(
@@ -518,7 +579,10 @@ class _SettingTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     return ListTile(
-      contentPadding: EdgeInsets.symmetric(horizontal: AppSpacing.pageMargin, vertical: AppSpacing.xs),
+      contentPadding: EdgeInsets.symmetric(
+        horizontal: AppSpacing.pageMargin,
+        vertical: AppSpacing.xs,
+      ),
       leading: _IconTile(icon: icon, color: iconColor),
       title: Text(title),
       subtitle: Text(subtitle),

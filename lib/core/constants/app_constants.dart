@@ -1,7 +1,7 @@
 class AppConstants {
   // App Information
   static const String appName = 'Item Vault';
-  static const String appVersion = '2.0.0';
+  static const String appVersion = '2.0.4';
 
   // Database
   static const String databaseName = 'kipt.db';
@@ -59,6 +59,8 @@ class AppConstants {
 
   // Backup / Restore
   static const String backupFileName = 'kipt_backup';
+  static const String backupFileExtension = '.zip';
+  static const String backupMimeType = 'application/zip';
   static const String backupDataFileName = 'data.json';
   static const String backupImagesFolder = 'images';
 

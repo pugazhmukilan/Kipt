@@ -27,11 +27,6 @@ void main() async {
     Future(() => tz.initializeTimeZones()),
   ]);
 
-  // Initialize notification service in background (non-blocking)
-  NotificationService().initialize().catchError((e) {
-    // Silent fail - notifications can be initialized later if needed
-  });
-
   runApp(const KiptApp());
 }
 
