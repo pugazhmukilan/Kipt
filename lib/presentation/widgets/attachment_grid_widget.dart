@@ -299,15 +299,18 @@ class FullScreenImageViewer extends StatelessWidget {
         ],
       ),
       body: Center(
-        child: InteractiveViewer(
-          boundaryMargin: const EdgeInsets.all(160),
-          clipBehavior: Clip.none,
-          minScale: 1.0,
-          maxScale: 5.0,
-          panEnabled: true,
-          scaleEnabled: true,
-          child: Image.file(File(path)),
-        ),
+child: GestureDetector(
+            onDoubleTap: () {},
+            child: InteractiveViewer(
+              boundaryMargin: const EdgeInsets.all(160),
+              clipBehavior: Clip.none,
+              minScale: 0.5,
+              maxScale: 5.0,
+              panEnabled: true,
+              scaleEnabled: true,
+              child: Image.file(File(path)),
+            ),
+          ),
       ),
     );
   }
