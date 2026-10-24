@@ -14,6 +14,28 @@ if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(FileInputStream(keystorePropertiesFile))
 }
 
+// The versionCode/versionName are parsed straight from pubspec.yaml instead of relying on
+// `flutter.versionCode` / `flutter.versionName`.
+val pubspecVersion = rootProject.file("../pubspec.yaml")
+    .readLines()
+    .firstOrNull { it.trimStart().startsWith("version:") }
+    ?.substringAfter("version:")
+    ?.trim()
+    .orEmpty()
+
+val appVersionName = pubspecVersion.substringBefore("+")
+val appVersionCode = pubspecVersion.substringAfter("+", "")
+    .takeIf { it.isNotEmpty() }
+    ?.toIntOrNull()
+
+require(appVersionCode != null) {
+    "pubspec.yaml has `version: $pubspecVersion`, which has no build number. " +
+        "Flutter then silently builds with versionCode 1. " +
+        "Use `version: ${appVersionName.ifEmpty { "1.0.0" }}+<buildNumber>` " +
+        "(e.g. `version: ${appVersionName.ifEmpty { "1.0.0" }}+100`) and make the build number " +
+        "higher than every versionCode already published on Play Console."
+}
+
 android {
     namespace = "com.pugazh.kipt"
     compileSdk = flutter.compileSdkVersion
@@ -26,17 +48,15 @@ android {
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_17.toString()
+        jvmTarget = "17"
     }
 
     defaultConfig {
         applicationId = "com.pugazh.kipt"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
-        versionCode = flutter.versionCode
-        versionName = flutter.versionName
+        versionCode = appVersionCode
+        versionName = appVersionName
     }
 
     signingConfigs {
@@ -49,14 +69,14 @@ android {
     }
 
     buildTypes {
-        release {
-            signingConfig = signingConfigs.getByName("release")
-            isMinifyEnabled = false
-            isShrinkResources = false
+        getByName("release") {
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro",
+                "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("release")
         }
     }
 }
